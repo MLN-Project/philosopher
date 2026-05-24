@@ -20,7 +20,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     era: "Historical materialism",
     shortLabel: "Material life before abstract ideals",
     color: "#8f241d",
-    portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Karl_Marx_001.jpg",
+    portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Karl_Marx.jpg",
     quote: "The philosophers have only interpreted the world; the point is to change it.",
     quoteNote: "Theses on Feuerbach",
     description:
@@ -33,7 +33,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     era: "Dialectical materialism",
     shortLabel: "Pattern, production, and historical movement",
     color: "#9c4a22",
-    portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Friedrich_Engels_portrait.jpg",
+    portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Friedrich_Engels_portrait_(cropped).jpg",
     quote: "Freedom is the recognition of necessity.",
     quoteNote: "Anti-Duhring",
     description:
@@ -46,7 +46,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     era: "Practice and revolution",
     shortLabel: "Analysis must become organized action",
     color: "#a62f1f",
-    portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Lenin_in_1920_(cropped).jpg",
+    portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Vladimir_Lenin.jpg",
     quote: "Without revolutionary theory there can be no revolutionary movement.",
     quoteNote: "What Is To Be Done?",
     description:
@@ -72,7 +72,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     era: "Humanist materialism",
     shortLabel: "Human need beneath sacred projection",
     color: "#986735",
-    portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Ludwig_Feuerbach.jpg",
+    portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Feuerbach_Ludwig.jpg",
     quote: "Man is what he eats.",
     quoteNote: "Attributed summary of his materialism",
     description:
@@ -85,7 +85,8 @@ export const PHILOSOPHERS: Philosopher[] = [
     era: "Classical idealism",
     shortLabel: "Order the soul toward the Good",
     color: "#546b63",
-    portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Plato_Silanion_Musei_Capitolini_MC1377.jpg",
+    portraitUrl:
+      "https://commons.wikimedia.org/wiki/Special:FilePath/Naples-_National_Museum,_Plato,_bronze_bust_(Herculaneum,_1759),_No._5274_(SM_stf1507).png",
     quote: "The beginning is the most important part of the work.",
     quoteNote: "Republic",
     description:
@@ -98,7 +99,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     era: "Virtue and practical reason",
     shortLabel: "Character formed through measured action",
     color: "#7f6b32",
-    portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Aristotle_Altemps_Inv8575.jpg",
+    portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Aristotle_bust.jpg",
     quote: "We are what we repeatedly do.",
     quoteNote: "Common paraphrase of Nicomachean Ethics",
     description:
@@ -124,7 +125,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     era: "Relational ethics",
     shortLabel: "Humanity is cultivated through roles",
     color: "#7b4f28",
-    portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Confucius_Tang_Dynasty.jpg",
+    portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/孔子燕居像.png",
     quote: "To study and at due times practice what one has studied, is this not a pleasure?",
     quoteNote: "Analects",
     description:
@@ -137,7 +138,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     era: "Daoist harmony",
     shortLabel: "Power works best when it stops forcing",
     color: "#5f6f42",
-    portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Laozi.jpg",
+    portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Lao_Tzu.png",
     quote: "A journey of a thousand miles begins beneath one's feet.",
     quoteNote: "Dao De Jing",
     description:
@@ -150,7 +151,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     era: "Existential feminism",
     shortLabel: "Freedom becomes real through situated lives",
     color: "#6a3e4d",
-    portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Simone_de_Beauvoir2.png",
+    portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Simone_de_Beauvoir_1967_(cropped).jpg",
     quote: "One is not born, but rather becomes, woman.",
     quoteNote: "The Second Sex",
     description:
@@ -163,7 +164,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     era: "Existential freedom",
     shortLabel: "Choice reveals responsibility",
     color: "#4b4b3c",
-    portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Jean-Paul_Sartre_FP.JPG",
+    portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Jean_Paul_Sartre_1965_(cropped).jpg",
     quote: "Existence precedes essence.",
     quoteNote: "Existentialism Is a Humanism",
     description:

@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment, Float } from "@react-three/drei";
+import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import { useEffect, useRef } from "react";
-import type { Group } from "three";
+import { PHILOSOPHER_BY_ID } from "@/lib/philosophers";
+import type { PhilosopherId } from "@/lib/types";
 
 const chapters = [
   {
@@ -35,6 +35,21 @@ const chapters = [
     text: "The final question is personal: what kind of freedom do your answers keep trying to defend?",
     mark: "V"
   }
+];
+
+const timelinePhilosophers: PhilosopherId[] = [
+  "plato",
+  "aristotle",
+  "confucius",
+  "laozi",
+  "hegel",
+  "feuerbach",
+  "marx",
+  "engels",
+  "lenin",
+  "nietzsche",
+  "beauvoir",
+  "sartre"
 ];
 
 export function LandingExperience() {
@@ -67,8 +82,7 @@ export function LandingExperience() {
         })
         .to(".hero-video", { scale: 1.16, filter: "sepia(0.55) saturate(0.72) brightness(0.62)", ease: "none" }, 0)
         .to(".video-vignette", { opacity: 0.86, ease: "none" }, 0)
-        .to(".hero-copy", { y: -80, opacity: 0, ease: "none" }, 0.18)
-        .to(".hero-stage", { y: 90, opacity: 0, ease: "none" }, 0.22);
+        .to(".hero-copy", { y: -80, opacity: 0, ease: "none" }, 0.18);
 
       gsap.utils.toArray<HTMLElement>(".story-card").forEach((card) => {
         gsap.fromTo(
@@ -83,6 +97,40 @@ export function LandingExperience() {
               trigger: card,
               start: "top 78%",
               end: "bottom 46%",
+              scrub: 1
+            }
+          }
+        );
+      });
+
+      gsap.fromTo(
+        ".path-line-fill",
+        { scaleY: 0 },
+        {
+          scaleY: 1,
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".philosopher-path-section",
+            start: "top 62%",
+            end: "bottom 58%",
+            scrub: 1
+          }
+        }
+      );
+
+      gsap.utils.toArray<HTMLElement>(".philosopher-node").forEach((node) => {
+        gsap.fromTo(
+          node,
+          { opacity: 0.3, y: 52, scale: 0.92 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: node,
+              start: "top 78%",
+              end: "top 48%",
               scrub: 1
             }
           }
@@ -167,14 +215,43 @@ export function LandingExperience() {
               </a>
             </div>
           </div>
-          <div className="hero-stage" aria-hidden="true">
-            <Canvas camera={{ position: [0, 0, 7], fov: 45 }}>
-              <ambientLight intensity={1.6} />
-              <directionalLight position={[4, 5, 5]} intensity={2.8} color="#ffd08a" />
-              <ParchmentScene />
-              <Environment preset="warehouse" />
-            </Canvas>
+        </div>
+      </section>
+
+      <section className="philosopher-path-section" aria-label="Connected philosopher timeline">
+        <div className="path-intro">
+          <span>Follow the line</span>
+          <h2>A path of thinkers across the map</h2>
+          <p>
+            As you scroll, the route moves from ancient ideals and virtue, through dialectics and materialism,
+            toward freedom, critique, and existence.
+          </p>
+        </div>
+        <div className="philosopher-path">
+          <div className="path-line" aria-hidden="true">
+            <span className="path-line-fill" />
           </div>
+          {timelinePhilosophers.map((id, index) => {
+            const philosopher = PHILOSOPHER_BY_ID[id];
+            return (
+              <article className="philosopher-node" key={id}>
+                <div className="node-index">{String(index + 1).padStart(2, "0")}</div>
+                <div className="node-portrait">
+                  <Image
+                    alt={`${philosopher.name} portrait`}
+                    height={420}
+                    src={philosopher.portraitUrl}
+                    unoptimized
+                    width={340}
+                  />
+                </div>
+                <div className="node-copy">
+                  <h3>{philosopher.name}</h3>
+                  <p>{philosopher.shortLabel}</p>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
 
@@ -205,46 +282,5 @@ export function LandingExperience() {
         </div>
       </section>
     </main>
-  );
-}
-
-function ParchmentScene() {
-  const group = useRef<Group>(null);
-
-  useFrame(({ clock, pointer }) => {
-    if (!group.current) return;
-    group.current.rotation.y = pointer.x * 0.18 + Math.sin(clock.elapsedTime * 0.3) * 0.05;
-    group.current.rotation.x = -pointer.y * 0.08;
-  });
-
-  return (
-    <group ref={group}>
-      <Float speed={1.2} rotationIntensity={0.25} floatIntensity={0.45}>
-        <mesh position={[0, 0.1, 0]} rotation={[0.2, -0.28, -0.08]}>
-          <boxGeometry args={[4.7, 3.1, 0.05]} />
-          <meshStandardMaterial color="#d9ad68" roughness={0.85} metalness={0.05} />
-        </mesh>
-        <mesh position={[-1.35, 0.68, 0.09]} rotation={[0.2, -0.28, -0.08]}>
-          <torusGeometry args={[0.38, 0.008, 8, 80]} />
-          <meshStandardMaterial color="#6c341f" roughness={0.9} />
-        </mesh>
-        <mesh position={[1.05, -0.72, 0.12]} rotation={[0.2, -0.28, -0.08]}>
-          <torusGeometry args={[0.62, 0.01, 8, 100]} />
-          <meshStandardMaterial color="#6f5b32" roughness={0.9} />
-        </mesh>
-      </Float>
-      <Float speed={1.7} rotationIntensity={0.35} floatIntensity={0.7}>
-        <mesh position={[-1.9, -1.15, 0.7]} rotation={[0.5, 0.2, 0.18]}>
-          <cylinderGeometry args={[0.26, 0.34, 1.3, 32]} />
-          <meshStandardMaterial color="#c8b69a" roughness={0.72} />
-        </mesh>
-      </Float>
-      <Float speed={1.1} rotationIntensity={0.2} floatIntensity={0.35}>
-        <mesh position={[2.1, 1.15, -0.2]} rotation={[0.1, -0.4, 0.35]}>
-          <boxGeometry args={[1.15, 0.72, 0.03]} />
-          <meshStandardMaterial color="#c89452" roughness={0.9} />
-        </mesh>
-      </Float>
-    </group>
   );
 }
