@@ -56,6 +56,20 @@ export function LandingExperience() {
     frame = requestAnimationFrame(raf);
 
     const context = gsap.context(() => {
+      gsap
+        .timeline({
+          scrollTrigger: {
+            trigger: ".hero-section",
+            start: "top top",
+            end: "bottom top",
+            scrub: 1
+          }
+        })
+        .to(".hero-video", { scale: 1.16, filter: "sepia(0.55) saturate(0.72) brightness(0.62)", ease: "none" }, 0)
+        .to(".video-vignette", { opacity: 0.86, ease: "none" }, 0)
+        .to(".hero-copy", { y: -80, opacity: 0, ease: "none" }, 0.18)
+        .to(".hero-stage", { y: 90, opacity: 0, ease: "none" }, 0.22);
+
       gsap.utils.toArray<HTMLElement>(".story-card").forEach((card) => {
         gsap.fromTo(
           card,
@@ -116,7 +130,20 @@ export function LandingExperience() {
     <main ref={rootRef} className="landing-shell">
       <div className="map-noise" aria-hidden="true" />
       <section className="hero-section">
-        <div className="hero-copy">
+        <div className="hero-sticky">
+          <div className="video-background" aria-hidden="true">
+            <video
+              autoPlay
+              className="hero-video"
+              loop
+              muted
+              playsInline
+              preload="auto"
+              src="/videos/map-transition-philosopher-places.mp4"
+            />
+            <div className="video-vignette" />
+            <div className="video-paper-grain" />
+          </div>
           <nav className="top-nav" aria-label="Main navigation">
             <span className="brand-mark">Philosopher Atlas</span>
             <div>
@@ -124,28 +151,30 @@ export function LandingExperience() {
               <Link href="/credits">Credits</Link>
             </div>
           </nav>
-          <p className="scribe-line">A cinematic personality test through ancient questions and material history.</p>
-          <h1>Which philosopher is hidden in your way of seeing the world?</h1>
-          <p className="hero-text">
-            Walk through a parchment map of ideas, contradiction, society, power, and freedom. At the end,
-            your answers are scored against twelve thinkers from Plato to Marx, Lenin, Beauvoir, Laozi, and Sartre.
-          </p>
-          <div className="hero-actions">
-            <Link className="primary-cta" href="/quiz">
-              Take the Test
-            </Link>
-            <a className="secondary-cta" href="#story">
-              Enter the scroll
-            </a>
+          <div className="hero-copy">
+            <p className="scribe-line">A cinematic personality test through ancient questions and material history.</p>
+            <h1>Which philosopher is hidden in your way of seeing the world?</h1>
+            <p className="hero-text">
+              Walk through a parchment map of ideas, contradiction, society, power, and freedom. At the end,
+              your answers are scored against twelve thinkers from Plato to Marx, Lenin, Beauvoir, Laozi, and Sartre.
+            </p>
+            <div className="hero-actions">
+              <Link className="primary-cta" href="/quiz">
+                Take the Test
+              </Link>
+              <a className="secondary-cta" href="#story">
+                Enter the scroll
+              </a>
+            </div>
           </div>
-        </div>
-        <div className="hero-stage" aria-hidden="true">
-          <Canvas camera={{ position: [0, 0, 7], fov: 45 }}>
-            <ambientLight intensity={1.6} />
-            <directionalLight position={[4, 5, 5]} intensity={2.8} color="#ffd08a" />
-            <ParchmentScene />
-            <Environment preset="warehouse" />
-          </Canvas>
+          <div className="hero-stage" aria-hidden="true">
+            <Canvas camera={{ position: [0, 0, 7], fov: 45 }}>
+              <ambientLight intensity={1.6} />
+              <directionalLight position={[4, 5, 5]} intensity={2.8} color="#ffd08a" />
+              <ParchmentScene />
+              <Environment preset="warehouse" />
+            </Canvas>
+          </div>
         </div>
       </section>
 
