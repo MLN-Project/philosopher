@@ -104,10 +104,11 @@ export function LandingExperience() {
       });
 
       gsap.fromTo(
-        ".path-line-fill",
-        { scaleY: 0 },
+        ".route-thread",
+        { scaleY: 0, opacity: 0.2 },
         {
           scaleY: 1,
+          opacity: 0.7,
           ease: "none",
           scrollTrigger: {
             trigger: ".philosopher-path-section",
@@ -219,6 +220,7 @@ export function LandingExperience() {
       </section>
 
       <section className="philosopher-path-section" aria-label="Connected philosopher timeline">
+        <div className="path-texture" aria-hidden="true" />
         <div className="path-intro">
           <span>Follow the line</span>
           <h2>A path of thinkers across the map</h2>
@@ -228,26 +230,26 @@ export function LandingExperience() {
           </p>
         </div>
         <div className="philosopher-path">
-          <div className="path-line" aria-hidden="true">
-            <span className="path-line-fill" />
-          </div>
+          <div className="route-thread" aria-hidden="true" />
           {timelinePhilosophers.map((id, index) => {
             const philosopher = PHILOSOPHER_BY_ID[id];
             return (
               <article className="philosopher-node" key={id}>
-                <div className="node-index">{String(index + 1).padStart(2, "0")}</div>
                 <div className="node-portrait">
                   <Image
                     alt={`${philosopher.name} portrait`}
-                    height={420}
+                    height={680}
                     src={philosopher.portraitUrl}
                     unoptimized
-                    width={340}
+                    width={520}
                   />
+                  <span>{String(index + 1).padStart(2, "0")}</span>
                 </div>
                 <div className="node-copy">
+                  <p className="node-era">{philosopher.era}</p>
                   <h3>{philosopher.name}</h3>
-                  <p>{philosopher.shortLabel}</p>
+                  <p>{philosopher.description}</p>
+                  <blockquote>{philosopher.shortLabel}</blockquote>
                 </div>
               </article>
             );
