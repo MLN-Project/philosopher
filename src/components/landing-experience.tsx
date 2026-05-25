@@ -6,6 +6,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import { useEffect, useRef } from "react";
+import type { PointerEvent } from "react";
 import { PHILOSOPHER_BY_ID } from "@/lib/philosophers";
 import type { PhilosopherId } from "@/lib/types";
 
@@ -54,6 +55,19 @@ const timelinePhilosophers: PhilosopherId[] = [
 
 export function LandingExperience() {
   const rootRef = useRef<HTMLElement>(null);
+  const pathSectionRef = useRef<HTMLElement>(null);
+
+  const handlePathPointerMove = (event: PointerEvent<HTMLElement>) => {
+    const section = event.currentTarget;
+    const rect = section.getBoundingClientRect();
+    section.style.setProperty("--grid-x", `${event.clientX - rect.left}px`);
+    section.style.setProperty("--grid-y", `${event.clientY - rect.top}px`);
+    section.classList.add("is-grid-active");
+  };
+
+  const handlePathPointerLeave = () => {
+    pathSectionRef.current?.classList.remove("is-grid-active");
+  };
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -219,8 +233,14 @@ export function LandingExperience() {
         </div>
       </section>
 
-      <section className="philosopher-path-section" aria-label="Connected philosopher timeline">
-        <div className="path-texture" aria-hidden="true" />
+      <section
+        ref={pathSectionRef}
+        className="philosopher-path-section"
+        aria-label="Connected philosopher timeline"
+        onPointerLeave={handlePathPointerLeave}
+        onPointerMove={handlePathPointerMove}
+      >
+        <div className="path-grid-texture" aria-hidden="true" />
         <div className="path-intro">
           <span>Follow the line</span>
           <h2>A path of thinkers across the map</h2>
@@ -231,7 +251,7 @@ export function LandingExperience() {
         </div>
         <div className="philosopher-path">
           <div className="route-thread" aria-hidden="true" />
-          {timelinePhilosophers.map((id, index) => {
+          {timelinePhilosophers.map((id) => {
             const philosopher = PHILOSOPHER_BY_ID[id];
             return (
               <article className="philosopher-node" key={id}>
@@ -239,11 +259,10 @@ export function LandingExperience() {
                   <Image
                     alt={`${philosopher.name} portrait`}
                     height={680}
-                    src={philosopher.portraitUrl}
+                    src={philosopher.cutoutUrl}
                     unoptimized
                     width={520}
                   />
-                  <span>{String(index + 1).padStart(2, "0")}</span>
                 </div>
                 <div className="node-copy">
                   <p className="node-era">{philosopher.era}</p>
