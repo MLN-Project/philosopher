@@ -212,7 +212,7 @@ export function LandingExperience() {
                 Take the Test
               </Link>
               <a className="secondary-cta" href="#story">
-                Enter the scroll
+                Enter the path
               </a>
             </div>
           </div>

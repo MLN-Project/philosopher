@@ -361,13 +361,244 @@ img {
   line-height: 1.65;
 }
 
+.atlas-map {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(240px, 0.42fr) minmax(0, 0.58fr);
+  gap: clamp(1.25rem, 4vw, 3rem);
+  align-items: stretch;
+  width: min(1180px, 100%);
+  margin: 0 auto clamp(5rem, 11vw, 9rem);
+}
+
+.atlas-map-copy,
+.atlas-map-window {
+  border: 1px solid rgba(83, 45, 26, 0.22);
+  background:
+    linear-gradient(135deg, rgba(255, 243, 203, 0.72), rgba(203, 146, 72, 0.34)),
+    repeating-linear-gradient(90deg, transparent 0 22px, rgba(74, 40, 22, 0.035) 22px 23px);
+  box-shadow: 0 24px 70px rgba(55, 29, 17, 0.14);
+}
+
+.atlas-map-copy {
+  position: sticky;
+  top: 2rem;
+  align-self: start;
+  min-height: 24rem;
+  border-radius: 2rem;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.atlas-map-copy h3 {
+  margin: 0 0 0.85rem;
+  font-size: clamp(2.3rem, 5vw, 4.7rem);
+  line-height: 0.88;
+  letter-spacing: -0.07em;
+}
+
+.atlas-map-copy p:not(.node-era) {
+  margin: 0;
+  color: var(--muted-ink);
+  font-size: clamp(1rem, 1.4vw, 1.18rem);
+  line-height: 1.65;
+}
+
+.atlas-map-copy span {
+  display: inline-flex;
+  margin-top: 1.35rem;
+  border: 1px solid rgba(103, 49, 28, 0.2);
+  border-radius: 999px;
+  padding: 0.72rem 0.95rem;
+  color: var(--accent);
+  background: rgba(255, 239, 201, 0.48);
+  font-weight: 900;
+}
+
+.atlas-map-window {
+  position: relative;
+  height: clamp(34rem, 75vh, 46rem);
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 2.3rem;
+  isolation: isolate;
+}
+
+.atlas-map-window::before,
+.atlas-map-window::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  height: 7rem;
+  pointer-events: none;
+}
+
+.atlas-map-window::before {
+  top: 0;
+  background: linear-gradient(180deg, rgba(238, 211, 161, 0.96), rgba(238, 211, 161, 0));
+}
+
+.atlas-map-window::after {
+  bottom: 0;
+  background: linear-gradient(0deg, rgba(200, 143, 77, 0.92), rgba(200, 143, 77, 0));
+}
+
+.atlas-map-canvas {
+  position: relative;
+  height: 1180px;
+  min-height: 100%;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 24% 12%, rgba(73, 91, 59, 0.26), transparent 12rem),
+    radial-gradient(ellipse at 72% 24%, rgba(65, 103, 83, 0.2), transparent 13rem),
+    radial-gradient(ellipse at 54% 54%, rgba(115, 77, 39, 0.22), transparent 20rem),
+    radial-gradient(ellipse at 44% 88%, rgba(88, 106, 72, 0.22), transparent 16rem),
+    linear-gradient(115deg, #f2ddaa, #dca968 52%, #a66a38);
+  animation: atlas-drift 42s ease-in-out infinite alternate;
+  transform: translateY(0);
+}
+
+.atlas-map-window:hover .atlas-map-canvas,
+.atlas-map-window:focus-within .atlas-map-canvas {
+  animation-play-state: paused;
+}
+
+.atlas-map-canvas::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.34;
+  mix-blend-mode: multiply;
+  background-image:
+    linear-gradient(rgba(74, 40, 22, 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74, 40, 22, 0.13) 1px, transparent 1px),
+    radial-gradient(circle at 22% 18%, transparent 0 4rem, rgba(74, 40, 22, 0.18) 4.1rem, transparent 4.2rem),
+    radial-gradient(circle at 68% 42%, transparent 0 6rem, rgba(74, 40, 22, 0.16) 6.1rem, transparent 6.2rem),
+    radial-gradient(circle at 38% 76%, transparent 0 5rem, rgba(74, 40, 22, 0.15) 5.1rem, transparent 5.2rem);
+  background-size: 74px 74px, 74px 74px, 100% 100%, 100% 100%, 100% 100%;
+}
+
+.atlas-coast {
+  position: absolute;
+  pointer-events: none;
+  filter: blur(0.2px);
+}
+
+.atlas-coast.west {
+  top: 5%;
+  left: -15%;
+  width: 48%;
+  height: 92%;
+  border-radius: 42% 58% 44% 56%;
+  background:
+    radial-gradient(ellipse at 62% 18%, rgba(99, 111, 69, 0.38), transparent 62%),
+    linear-gradient(145deg, rgba(105, 82, 42, 0.34), rgba(70, 96, 67, 0.18));
+  transform: rotate(-9deg);
+}
+
+.atlas-coast.east {
+  top: 0;
+  right: -12%;
+  width: 52%;
+  height: 100%;
+  border-radius: 54% 46% 56% 44%;
+  background:
+    radial-gradient(ellipse at 28% 22%, rgba(80, 102, 73, 0.32), transparent 58%),
+    radial-gradient(ellipse at 48% 76%, rgba(93, 65, 37, 0.24), transparent 62%);
+  transform: rotate(8deg);
+}
+
+.atlas-route-line {
+  position: absolute;
+  top: 7%;
+  left: 50%;
+  width: 40%;
+  height: 88%;
+  border-left: 3px solid rgba(126, 39, 29, 0.46);
+  border-radius: 50%;
+  opacity: 0.72;
+  transform: translateX(-50%) skewX(-9deg);
+  box-shadow: -10px 0 32px rgba(126, 39, 29, 0.18);
+}
+
+.atlas-marker {
+  position: absolute;
+  z-index: 2;
+  left: var(--marker-x);
+  top: var(--marker-y);
+  display: inline-grid;
+  grid-template-columns: auto minmax(7.5rem, max-content);
+  gap: 0.58rem;
+  align-items: center;
+  max-width: min(16rem, 46vw);
+  padding: 0;
+  color: #2c1710;
+  background: transparent;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+}
+
+.atlas-marker-number {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 239, 201, 0.58);
+  border-radius: 50%;
+  background: rgba(83, 31, 23, 0.88);
+  color: #fff2d2;
+  box-shadow: 0 12px 24px rgba(55, 29, 17, 0.2);
+  font-size: 0.92rem;
+  font-weight: 900;
+}
+
+.atlas-marker-label {
+  display: grid;
+  gap: 0.1rem;
+  border: 1px solid rgba(80, 43, 24, 0.2);
+  border-radius: 1rem;
+  padding: 0.52rem 0.68rem;
+  background: rgba(255, 240, 203, 0.76);
+  box-shadow: 0 12px 28px rgba(55, 29, 17, 0.12);
+  text-align: left;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.atlas-marker-label strong {
+  font-size: 0.96rem;
+  line-height: 1.05;
+}
+
+.atlas-marker-label small {
+  color: var(--muted-ink);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.atlas-marker:hover .atlas-marker-label,
+.atlas-marker:focus-visible .atlas-marker-label,
+.atlas-marker[aria-pressed="true"] .atlas-marker-label {
+  background: rgba(255, 248, 223, 0.94);
+  transform: translateY(-2px);
+}
+
+.atlas-marker:focus-visible {
+  outline: 0;
+}
+
+.atlas-marker:focus-visible .atlas-marker-number {
+  outline: 3px solid #f3bb63;
+  outline-offset: 4px;
+}
+
 .philosopher-path {
   position: relative;
   display: grid;
-  gap: clamp(4rem, 9vw, 8rem);
+  gap: clamp(5rem, 10vw, 9rem);
   width: min(1180px, 100%);
   margin: 0 auto;
-  padding-block: 2rem;
+  padding-block: clamp(2rem, 5vw, 4rem);
 }
 
 .route-thread {
@@ -375,12 +606,12 @@ img {
   top: 6rem;
   bottom: 6rem;
   left: 50%;
-  width: 2px;
+  width: 1px;
   border-radius: 999px;
   background:
-    linear-gradient(180deg, rgba(123, 31, 25, 0), rgba(123, 31, 25, 0.7), rgba(208, 116, 53, 0.68), rgba(95, 111, 66, 0)),
-    repeating-linear-gradient(180deg, rgba(74, 40, 22, 0.3) 0 10px, transparent 10px 18px);
-  box-shadow: 0 0 28px rgba(151, 40, 31, 0.38);
+    linear-gradient(180deg, rgba(123, 31, 25, 0), rgba(123, 31, 25, 0.56), rgba(224, 172, 89, 0.82), rgba(95, 111, 66, 0)),
+    repeating-linear-gradient(180deg, rgba(255, 239, 201, 0.34) 0 12px, transparent 12px 23px);
+  box-shadow: 0 0 36px rgba(208, 116, 53, 0.28);
   transform: scaleY(0);
   transform-origin: top;
 }
@@ -388,8 +619,8 @@ img {
 .philosopher-node {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1fr);
-  gap: clamp(1.5rem, 5vw, 5rem);
+  grid-template-columns: minmax(260px, 0.68fr) minmax(0, 1fr);
+  gap: clamp(2.5rem, 7vw, 7rem);
   align-items: center;
   min-height: clamp(360px, 52vw, 560px);
 }
@@ -416,29 +647,32 @@ img {
 .node-portrait {
   position: relative;
   z-index: 1;
-  width: min(420px, 100%);
+  width: min(430px, 100%);
   aspect-ratio: 0.78;
   overflow: hidden;
   justify-self: center;
-  border: 8px solid rgba(255, 235, 183, 0.6);
-  border-radius: 48% 48% 2rem 2rem;
+  border: 1px solid rgba(255, 239, 201, 0.52);
+  outline: 10px solid rgba(75, 40, 23, 0.1);
+  border-radius: 50% 50% 1.2rem 1.2rem;
   background:
     radial-gradient(circle at 50% 22%, rgba(255, 235, 183, 0.28), transparent 14rem),
     #3c2116;
-  box-shadow: 0 34px 90px rgba(55, 29, 17, 0.28);
+  box-shadow:
+    0 34px 90px rgba(55, 29, 17, 0.28),
+    inset 0 0 0 1px rgba(255, 239, 201, 0.32);
 }
 
 .node-portrait img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: sepia(0.8) contrast(1.08) saturate(0.7);
-  transition: transform 0.5s ease, filter 0.5s ease;
+  filter: sepia(0.72) contrast(1.1) saturate(0.72) brightness(0.92);
+  transition: transform 0.55s ease, filter 0.55s ease;
 }
 
 .node-portrait:hover img {
-  transform: scale(1.04);
-  filter: sepia(0.56) contrast(1.08) saturate(0.82);
+  transform: scale(1.035);
+  filter: sepia(0.5) contrast(1.12) saturate(0.86) brightness(0.98);
 }
 
 .node-portrait span {
@@ -455,31 +689,47 @@ img {
   color: #fff2d2;
   font-size: clamp(1.2rem, 3vw, 2.3rem);
   font-weight: 900;
-  letter-spacing: -0.08em;
+  letter-spacing: 0;
 }
 
 .node-copy {
   position: relative;
-  border: 1px solid rgba(83, 45, 26, 0.2);
-  border-radius: 2rem;
-  padding: clamp(1.25rem, 4vw, 3rem);
-  background:
-    linear-gradient(135deg, rgba(255, 243, 203, 0.74), rgba(203, 146, 72, 0.36)),
-    repeating-linear-gradient(90deg, transparent 0 22px, rgba(74, 40, 22, 0.035) 22px 23px);
-  box-shadow: 0 24px 70px rgba(55, 29, 17, 0.14);
+  max-width: 42rem;
+  padding-block: clamp(0.5rem, 2vw, 1.3rem);
+  color: color-mix(in srgb, var(--ink) 88%, #5c2818);
+}
+
+.node-copy::before {
+  content: "";
+  display: block;
+  width: min(12rem, 48%);
+  height: 1px;
+  margin-bottom: clamp(1rem, 2.5vw, 1.7rem);
+  background: linear-gradient(90deg, rgba(151, 40, 31, 0.88), rgba(224, 172, 89, 0.36), transparent);
+}
+
+.philosopher-node:nth-child(even) .node-copy {
+  justify-self: end;
+}
+
+.philosopher-node:nth-child(even) .node-copy::before {
+  margin-left: auto;
+  background: linear-gradient(270deg, rgba(151, 40, 31, 0.88), rgba(224, 172, 89, 0.36), transparent);
 }
 
 .node-copy h3 {
-  margin: 0 0 0.7rem;
-  font-size: clamp(2.4rem, 6vw, 5.7rem);
-  line-height: 0.86;
-  letter-spacing: -0.07em;
+  margin: 0 0 clamp(0.7rem, 1.5vw, 1rem);
+  color: #2a160f;
+  font-size: clamp(2.8rem, 6vw, 6.1rem);
+  line-height: 0.88;
+  letter-spacing: 0;
+  text-shadow: 0 1px 0 rgba(255, 248, 220, 0.42);
 }
 
 .node-era {
-  margin: 0 0 0.85rem;
-  color: var(--accent);
-  letter-spacing: 0.14em;
+  margin: 0 0 1rem;
+  color: color-mix(in srgb, var(--accent) 84%, #3b1b12);
+  letter-spacing: 0;
   text-transform: uppercase;
   font-size: 0.78rem;
   font-weight: 900;
@@ -487,18 +737,31 @@ img {
 
 .node-copy p {
   margin: 0;
-  color: var(--muted-ink);
-  font-size: clamp(1rem, 1.4vw, 1.2rem);
-  line-height: 1.65;
+  max-width: 34rem;
+  color: color-mix(in srgb, var(--ink) 70%, #6f4a34);
+  font-size: clamp(1.04rem, 1.45vw, 1.24rem);
+  line-height: 1.72;
+}
+
+.philosopher-node:nth-child(even) .node-copy p {
+  margin-left: auto;
 }
 
 .node-copy blockquote {
-  margin: 1.35rem 0 0;
-  border-left: 3px solid var(--accent);
+  margin: clamp(1.35rem, 2.5vw, 2rem) 0 0;
+  border-left: 1px solid rgba(151, 40, 31, 0.58);
   padding-left: 1rem;
-  color: color-mix(in srgb, var(--ink) 78%, var(--accent));
-  font-size: clamp(1.15rem, 2vw, 1.55rem);
-  line-height: 1.28;
+  color: color-mix(in srgb, var(--ink) 82%, var(--accent));
+  font-size: clamp(1.18rem, 2vw, 1.62rem);
+  font-style: italic;
+  line-height: 1.32;
+}
+
+.philosopher-node:nth-child(even) .node-copy blockquote {
+  border-left: 0;
+  border-right: 1px solid rgba(151, 40, 31, 0.58);
+  padding-right: 1rem;
+  padding-left: 0;
 }
 
 .story-card {
@@ -946,6 +1209,16 @@ img {
   }
 }
 
+@keyframes atlas-drift {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(calc(-100% + clamp(34rem, 75vh, 46rem)));
+  }
+}
+
 @media (max-width: 900px) {
   .result-hero,
   .commentary-section {
@@ -986,6 +1259,42 @@ img {
   .philosopher-node:nth-child(even) .node-copy {
     grid-row: auto;
     text-align: left;
+    justify-self: start;
+  }
+
+  .philosopher-node:nth-child(even) .node-copy::before {
+    margin-left: 0;
+    background: linear-gradient(90deg, rgba(151, 40, 31, 0.88), rgba(224, 172, 89, 0.36), transparent);
+  }
+
+  .philosopher-node:nth-child(even) .node-copy p {
+    margin-left: 0;
+  }
+
+  .philosopher-node:nth-child(even) .node-copy blockquote {
+    border-right: 0;
+    border-left: 1px solid rgba(151, 40, 31, 0.58);
+    padding-right: 0;
+    padding-left: 1rem;
+  }
+
+  .atlas-map {
+    grid-template-columns: 1fr;
+  }
+
+  .atlas-map-copy {
+    position: relative;
+    top: auto;
+    min-height: auto;
+  }
+
+  .atlas-marker {
+    grid-template-columns: auto;
+    justify-items: center;
+  }
+
+  .atlas-marker-label {
+    text-align: center;
   }
 
   .node-portrait {
@@ -1018,6 +1327,26 @@ img {
   .story-card {
     grid-template-columns: 1fr;
   }
+
+  .atlas-map-window {
+    border-radius: 1.5rem;
+  }
+
+  .atlas-map-canvas {
+    height: 1040px;
+  }
+
+  .atlas-marker {
+    max-width: 8.5rem;
+  }
+
+  .atlas-marker-label strong {
+    font-size: 0.82rem;
+  }
+
+  .atlas-marker-label small {
+    font-size: 0.68rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1029,4 +1358,9 @@ img {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
+
+  .atlas-map-canvas {
+    transform: translateY(0);
+  }
+
 }
