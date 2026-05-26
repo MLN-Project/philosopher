@@ -5,8 +5,9 @@ import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { useEffect, useRef } from "react";
-import type { PointerEvent } from "react";
+import type { MouseEvent, PointerEvent } from "react";
 import { PHILOSOPHER_BY_ID } from "@/lib/philosophers";
 import type { PhilosopherId } from "@/lib/types";
 
@@ -71,6 +72,7 @@ const timelinePhilosophers: PhilosopherId[] = [
 export function LandingExperience() {
   const rootRef = useRef<HTMLElement>(null);
   const pathSectionRef = useRef<HTMLElement>(null);
+  const lenisRef = useRef<Lenis | null>(null);
 
   const handlePathPointerMove = (event: PointerEvent<HTMLElement>) => {
     const section = event.currentTarget;
@@ -84,12 +86,29 @@ export function LandingExperience() {
     pathSectionRef.current?.classList.remove("is-grid-active");
   };
 
+  const handleRevealPathClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    const pathSection = pathSectionRef.current;
+    if (!pathSection) return;
+
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(pathSection, {
+        duration: 1.65,
+        easing: (t: number) => 1 - Math.pow(1 - t, 4)
+      });
+      return;
+    }
+
+    pathSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (prefersReducedMotion) return;
 
     gsap.registerPlugin(ScrollTrigger);
     const lenis = new Lenis({ lerp: 0.08, wheelMultiplier: 0.9 });
+    lenisRef.current = lenis;
     let frame = 0;
 
     const raf = (time: number) => {
@@ -111,7 +130,8 @@ export function LandingExperience() {
         })
         .to(".hero-video", { scale: 1.16, filter: "sepia(0.55) saturate(0.72) brightness(0.62)", ease: "none" }, 0)
         .to(".video-vignette", { opacity: 0.86, ease: "none" }, 0)
-        .to(".hero-copy", { y: -80, opacity: 0, ease: "none" }, 0.18);
+        .to(".hero-copy", { y: -80, opacity: 0, ease: "none" }, 0.18)
+        .to(".hero-scroll-cue", { y: 38, opacity: 0, ease: "none" }, 0.1);
 
       gsap.utils.toArray<HTMLElement>(".story-card").forEach((card) => {
         gsap.fromTo(
@@ -168,9 +188,9 @@ export function LandingExperience() {
       });
 
       gsap.to(".landing-shell", {
-        "--paper-warmth": "#2d1711",
-        "--ink": "#fff2d2",
-        "--accent": "#f1b35a",
+        "--paper-warmth": "#f7e6bd",
+        "--ink": "#24140f",
+        "--accent": "#9f241c",
         scrollTrigger: {
           trigger: ".final-scroll",
           start: "top 70%",
@@ -179,28 +199,73 @@ export function LandingExperience() {
         }
       });
 
-      gsap.fromTo(
-        ".final-seal",
-        { scale: 0.74, rotate: -8, opacity: 0 },
-        {
-          scale: 1,
-          rotate: 0,
-          opacity: 1,
-          ease: "back.out(1.4)",
-          scrollTrigger: {
-            trigger: ".final-scroll",
-            start: "top 60%",
-            end: "top 20%",
-            scrub: 1
-          }
+      const finalReveal = gsap.timeline({
+        defaults: { ease: "power3.out" },
+        scrollTrigger: {
+          trigger: ".final-scroll",
+          start: "top 58%",
+          toggleActions: "play none none reverse"
         }
-      );
+      });
+
+      finalReveal
+        .from(".final-seal", { autoAlpha: 0, y: 28, duration: 0.7 })
+        .from(
+          ".final-copy > span",
+          {
+            autoAlpha: 0,
+            clipPath: "inset(0 100% 0 0)",
+            x: -18,
+            duration: 0.62
+          },
+          "-=0.35"
+        )
+        .from(
+          ".final-copy h2",
+          {
+            autoAlpha: 0,
+            clipPath: "inset(0 0 100% 0)",
+            yPercent: 10,
+            duration: 0.82
+          },
+          "-=0.36"
+        )
+        .from(
+          [".final-seal p", ".final-cta"],
+          {
+            autoAlpha: 0,
+            y: 20,
+            duration: 0.58,
+            stagger: 0.12
+          },
+          "-=0.32"
+        )
+        .from(
+          ".final-route",
+          {
+            autoAlpha: 0,
+            x: 34,
+            duration: 0.68
+          },
+          "-=0.58"
+        )
+        .from(
+          ".final-route div",
+          {
+            autoAlpha: 0,
+            x: 22,
+            duration: 0.46,
+            stagger: 0.1
+          },
+          "-=0.42"
+        );
     }, rootRef);
 
     return () => {
       context.revert();
       cancelAnimationFrame(frame);
       lenis.destroy();
+      lenisRef.current = null;
     };
   }, []);
 
@@ -236,19 +301,16 @@ export function LandingExperience() {
               Walk through a parchment map of ideas, contradiction, society, power, and freedom. At the end,
               your answers are scored against twelve thinkers from Plato to Marx, Lenin, Beauvoir, Laozi, and Sartre.
             </p>
-            <div className="hero-actions">
-              <Link className="primary-cta" href="/quiz">
-                Take the Test
-              </Link>
-              <a className="secondary-cta" href="#story">
-                Enter the path
-              </a>
-            </div>
           </div>
+          <a className="hero-scroll-cue" href="#path" onClick={handleRevealPathClick}>
+            <span>Reveal the path</span>
+            <ChevronDown aria-hidden="true" />
+          </a>
         </div>
       </section>
 
       <section
+        id="path"
         ref={pathSectionRef}
         className="philosopher-path-section"
         aria-label="Connected philosopher timeline"
@@ -313,15 +375,32 @@ export function LandingExperience() {
       <section className="final-scroll">
         <div className="final-seal">
           <div className="final-constellation" aria-hidden="true" />
-          <span>The map closes.</span>
-          <h2>Your answers become a philosophical portrait.</h2>
-          <p>
-            Thirty questions. Six hidden axes. One dominant match, three neighboring thinkers, quotes, and
-            reflective commentary shaped by your result.
-          </p>
-          <Link className="primary-cta large" href="/quiz">
-            Take the Test
-          </Link>
+          <div className="final-copy">
+            <span>The atlas resolves</span>
+            <h2>Find the thinker your answers have been tracing.</h2>
+            <p>
+              Open a scored result with your closest philosopher, neighboring influences, selected quotes,
+              and a short reflection on the pattern behind your choices.
+            </p>
+            <Link className="primary-cta large final-cta" href="/quiz">
+              Take the Test
+              <ArrowRight aria-hidden="true" />
+            </Link>
+          </div>
+          <div className="final-route" aria-label="Result summary">
+            <div>
+              <strong>30</strong>
+              <span>questions</span>
+            </div>
+            <div>
+              <strong>6</strong>
+              <span>hidden axes</span>
+            </div>
+            <div>
+              <strong>12</strong>
+              <span>thinkers</span>
+            </div>
+          </div>
         </div>
       </section>
     </main>

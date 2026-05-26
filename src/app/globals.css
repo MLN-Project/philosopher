@@ -229,11 +229,11 @@ img {
 }
 
 .hero-copy h1 {
-  max-width: 15ch;
-  margin: 0.65rem 0 0.9rem;
-  font-size: clamp(3.1rem, 6.7vw, 6.8rem);
-  line-height: 0.9;
-  letter-spacing: -0.07em;
+  max-width: 17ch;
+  margin: 0.65rem 0 1.05rem;
+  font-size: clamp(3rem, 6.1vw, 6.25rem);
+  line-height: 0.98;
+  letter-spacing: 0;
   text-wrap: balance;
 }
 
@@ -243,10 +243,57 @@ img {
 
 .hero-text {
   max-width: 46rem;
-  margin: 0 0 1.45rem;
+  margin: 0;
   color: rgba(255, 239, 202, 0.9);
   font-size: clamp(1.05rem, 1.5vw, 1.28rem);
   line-height: 1.7;
+}
+
+.hero-scroll-cue {
+  position: absolute;
+  bottom: clamp(3.6rem, 8vh, 5rem);
+  left: 50%;
+  z-index: 4;
+  display: inline-grid;
+  justify-items: center;
+  gap: 0.45rem;
+  color: rgba(255, 224, 167, 0.9);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-align: center;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+  text-transform: uppercase;
+  transform: translateX(-50%);
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.hero-scroll-cue svg {
+  width: 1.55rem;
+  height: 1.55rem;
+  stroke-width: 1.45;
+  opacity: 0.82;
+  animation: reveal-arrow-drift 2.4s ease-in-out infinite;
+}
+
+.hero-scroll-cue:hover {
+  color: #fff5d8;
+}
+
+.hero-scroll-cue:focus-visible {
+  outline: 3px solid #f3bb63;
+  outline-offset: 6px;
+}
+
+@keyframes reveal-arrow-drift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(0.22rem);
+  }
 }
 
 .hero-actions,
@@ -335,7 +382,8 @@ img {
   background:
     radial-gradient(ellipse at 10% 12%, rgba(255, 238, 184, 0.7), transparent 32rem),
     radial-gradient(ellipse at 86% 24%, rgba(88, 111, 66, 0.16), transparent 30rem),
-    linear-gradient(180deg, rgba(32, 16, 11, 0), rgba(235, 210, 164, 0.95) 11rem, rgba(212, 162, 88, 0.9) 58%, rgba(101, 57, 31, 0.92));
+    radial-gradient(ellipse at 48% 88%, rgba(255, 228, 164, 0.34), transparent 34rem),
+    linear-gradient(180deg, rgba(32, 16, 11, 0), rgba(235, 210, 164, 0.95) 11rem, rgba(221, 172, 101, 0.92) 58%, rgba(196, 137, 77, 0.9));
 }
 
 .story-section::before {
@@ -940,8 +988,8 @@ img {
 .chapter-answer-side {
   justify-self: stretch;
   max-width: 43rem;
-  border-top: 1px solid rgba(118, 52, 34, 0.28);
-  border-bottom: 1px solid rgba(255, 232, 177, 0.2);
+  border-top: 1px solid rgba(100, 48, 28, 0.32);
+  border-bottom: 1px solid rgba(255, 239, 199, 0.26);
   padding: clamp(1.5rem, 4vw, 3rem) 0;
 }
 
@@ -1025,7 +1073,7 @@ img {
   max-width: 30rem;
   margin-top: clamp(1.4rem, 2.4vw, 2rem);
   padding-top: clamp(1rem, 2vw, 1.4rem);
-  color: color-mix(in srgb, var(--ink) 64%, #6f4a34);
+  color: color-mix(in srgb, var(--ink) 76%, #6f4a34);
   font-size: clamp(0.88rem, 1.1vw, 1rem);
   line-height: 1.75;
 }
@@ -1056,8 +1104,8 @@ img {
   border: 1px solid rgba(255, 232, 177, 0.18);
   border-radius: 50%;
   background:
-    radial-gradient(circle, rgba(255, 238, 178, 0.32), rgba(130, 72, 38, 0.16) 48%, transparent 70%),
-    linear-gradient(135deg, rgba(255, 244, 211, 0.14), rgba(66, 32, 19, 0.12));
+    radial-gradient(circle, rgba(255, 239, 184, 0.44), rgba(157, 99, 49, 0.16) 48%, transparent 70%),
+    linear-gradient(135deg, rgba(255, 246, 220, 0.2), rgba(89, 46, 25, 0.08));
   color: rgba(69, 31, 21, 0.76);
   font-family: var(--font-cormorant);
   font-size: clamp(7rem, 17vw, 19rem);
@@ -1075,73 +1123,221 @@ img {
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 100svh;
-  padding: clamp(1.25rem, 4vw, 5rem);
+  min-height: 92svh;
+  padding: clamp(4rem, 8vw, 8rem) clamp(1.25rem, 5vw, 6rem);
   overflow: hidden;
   background:
-    radial-gradient(circle at 50% 12%, rgba(241, 179, 90, 0.22), transparent 24rem),
-    radial-gradient(circle at 18% 70%, rgba(95, 111, 66, 0.16), transparent 24rem),
-    linear-gradient(180deg, #65391f, #24120d 42%, #120b08);
+    radial-gradient(ellipse at 82% 18%, rgba(255, 250, 229, 0.95), transparent 28rem),
+    radial-gradient(ellipse at 12% 82%, rgba(96, 106, 66, 0.16), transparent 26rem),
+    linear-gradient(180deg, #c98f52 0%, #efd3a3 15%, #f7e6bd 54%, #f4ddad 100%);
 }
 
 .final-scroll::before {
   content: "";
   position: absolute;
   inset: 0;
-  opacity: 0.18;
+  opacity: 0.42;
   background-image:
-    linear-gradient(rgba(255, 232, 177, 0.2) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 232, 177, 0.14) 1px, transparent 1px);
-  background-size: 4.8rem 4.8rem;
-  mask-image: radial-gradient(circle at center, #000, transparent 68%);
-  -webkit-mask-image: radial-gradient(circle at center, #000, transparent 68%);
+    linear-gradient(rgba(86, 54, 28, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(86, 54, 28, 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 22% 32%, rgba(159, 36, 28, 0.18) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 64% 18%, rgba(96, 106, 66, 0.2) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 78% 68%, rgba(159, 36, 28, 0.14) 0 1px, transparent 1.8px);
+  background-size: 5rem 5rem, 5rem 5rem, 100% 100%, 100% 100%, 100% 100%;
+  mask-image: linear-gradient(180deg, transparent, #000 10%, #000 90%, transparent);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 10%, #000 90%, transparent);
+}
+
+.final-scroll::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(105, 58, 30, 0.2), transparent 13rem),
+    linear-gradient(0deg, rgba(105, 58, 30, 0.11), transparent 18rem);
 }
 
 .final-seal {
   position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(17rem, 24rem);
+  gap: clamp(2.5rem, 8vw, 7rem);
+  align-items: center;
   isolation: isolate;
-  width: min(900px, 100%);
-  border: 1px solid rgba(255, 221, 158, 0.22);
-  border-radius: 0.6rem;
-  padding: clamp(1.8rem, 7vw, 6rem);
-  background:
-    linear-gradient(135deg, rgba(52, 25, 17, 0.86), rgba(18, 10, 7, 0.84)),
-    radial-gradient(circle at 20% 0%, rgba(241, 179, 90, 0.24), transparent 20rem);
-  color: #fff2d2;
-  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.42);
+  width: min(1160px, 100%);
+  min-height: min(36rem, 70svh);
+  border-top: 1px solid rgba(86, 54, 28, 0.24);
+  border-bottom: 1px solid rgba(86, 54, 28, 0.22);
+  padding: clamp(2.25rem, 5vw, 4.25rem) 0;
+  background: transparent;
+  color: #24140f;
+  box-shadow: none;
 }
 
 .final-seal::before {
   content: "";
   position: absolute;
-  inset: clamp(0.75rem, 2vw, 1.35rem);
+  inset: clamp(2.25rem, 5vw, 4.25rem) auto clamp(2.25rem, 5vw, 4.25rem) -1.4rem;
   z-index: -1;
-  border: 1px solid rgba(255, 221, 158, 0.14);
-  border-radius: inherit;
+  width: 2px;
+  height: auto;
+  background: linear-gradient(180deg, transparent, rgba(159, 36, 28, 0.9), rgba(159, 36, 28, 0.22), transparent);
   pointer-events: none;
 }
 
 .final-constellation {
   position: absolute;
-  top: clamp(1.5rem, 4vw, 3rem);
-  right: clamp(1.5rem, 4vw, 3rem);
-  width: clamp(7rem, 16vw, 13rem);
+  top: 50%;
+  right: clamp(-6rem, -8vw, -2.5rem);
+  z-index: -1;
+  width: clamp(18rem, 34vw, 31rem);
   aspect-ratio: 1;
-  opacity: 0.72;
+  opacity: 0.3;
   background:
-    radial-gradient(circle at 22% 28%, #f1b35a 0 2px, transparent 2.5px),
-    radial-gradient(circle at 68% 18%, #fff1cd 0 1.5px, transparent 2px),
-    radial-gradient(circle at 78% 66%, #f1b35a 0 2px, transparent 2.5px),
-    radial-gradient(circle at 34% 76%, #fff1cd 0 1.5px, transparent 2px),
-    linear-gradient(42deg, transparent 48%, rgba(255, 221, 158, 0.28) 49%, rgba(255, 221, 158, 0.28) 50%, transparent 51%),
-    linear-gradient(112deg, transparent 48%, rgba(255, 221, 158, 0.2) 49%, rgba(255, 221, 158, 0.2) 50%, transparent 51%);
-  border: 1px solid rgba(255, 221, 158, 0.12);
+    radial-gradient(circle at 22% 28%, #9f241c 0 2px, transparent 2.8px),
+    radial-gradient(circle at 68% 18%, #606a42 0 1.8px, transparent 2.4px),
+    radial-gradient(circle at 78% 66%, #9f241c 0 2px, transparent 2.8px),
+    radial-gradient(circle at 34% 76%, #606a42 0 1.8px, transparent 2.4px),
+    linear-gradient(42deg, transparent 48%, rgba(86, 54, 28, 0.22) 49%, rgba(86, 54, 28, 0.22) 50%, transparent 51%),
+    linear-gradient(112deg, transparent 48%, rgba(86, 54, 28, 0.16) 49%, rgba(86, 54, 28, 0.16) 50%, transparent 51%),
+    radial-gradient(circle, rgba(255, 250, 229, 0.75), transparent 68%);
+  border: 1px solid rgba(86, 54, 28, 0.12);
   border-radius: 50%;
+  transform: translateY(-50%);
+  display: none;
+}
+
+.final-copy {
+  max-width: 62rem;
+}
+
+.final-copy > span,
+.final-copy h2,
+.final-seal p,
+.final-cta,
+.final-route,
+.final-route div {
+  will-change: transform, opacity, clip-path;
+}
+
+.final-copy > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #9f241c;
+  text-shadow: 0 1px 0 rgba(255, 247, 220, 0.65);
+}
+
+.final-copy > span::after {
+  content: "";
+  width: clamp(3rem, 8vw, 7rem);
+  height: 1px;
+  background: linear-gradient(90deg, rgba(159, 36, 28, 0.72), transparent);
+}
+
+.final-copy h2 {
+  max-width: 12.8ch;
+  margin: clamp(0.9rem, 2vw, 1.25rem) 0 clamp(1.15rem, 2.4vw, 1.7rem);
+  color: #24140f;
+  font-size: clamp(3rem, 7.4vw, 7.5rem);
+  line-height: 0.9;
+  letter-spacing: 0;
+  text-wrap: balance;
 }
 
 .final-seal p {
-  max-width: 48rem;
-  color: #e4c997;
+  max-width: 39rem;
+  margin: 0 0 clamp(1.5rem, 3vw, 2.25rem);
+  color: rgba(52, 31, 22, 0.76);
+  font-size: clamp(1rem, 1.35vw, 1.2rem);
+  line-height: 1.72;
+}
+
+.final-cta {
+  gap: 0.65rem;
+  background: linear-gradient(135deg, #b12d23, #6f1712);
+}
+
+.final-cta svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  transition: transform 0.2s ease;
+}
+
+.final-cta:hover svg {
+  transform: translateX(0.2rem);
+}
+
+.final-route {
+  position: relative;
+  display: grid;
+  gap: 0;
+  justify-self: end;
+  align-self: center;
+  align-content: center;
+  width: min(22rem, 100%);
+  border-top: 1px solid rgba(86, 54, 28, 0.24);
+  border-bottom: 1px solid rgba(86, 54, 28, 0.24);
+  background: transparent;
+}
+
+.final-route::before {
+  content: "Result index";
+  position: absolute;
+  top: -2.15rem;
+  left: 0;
+  color: #9f241c;
+  font-family: Constantia, "Bodoni MT", "Bodoni 72", Didot, Georgia, serif;
+  font-size: 0.76rem;
+  font-weight: 700;
+  font-variant-caps: small-caps;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.final-route::after {
+  content: "";
+  position: absolute;
+  top: -2.6rem;
+  right: 0;
+  width: 42%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(159, 36, 28, 0.52), transparent);
+}
+
+.final-route div {
+  display: grid;
+  grid-template-columns: minmax(4.6rem, auto) minmax(0, 1fr);
+  gap: 1.05rem;
+  align-items: baseline;
+  border-top: 1px solid rgba(86, 54, 28, 0.2);
+  padding: clamp(1.15rem, 2.2vw, 1.55rem) 0;
+  background: transparent;
+}
+
+.final-route div:first-child {
+  border-top: 0;
+}
+
+.final-route strong {
+  color: #9f241c;
+  font-family: Constantia, "Bodoni MT", "Bodoni 72", Didot, Georgia, serif;
+  font-size: clamp(3rem, 5.8vw, 5.15rem);
+  font-weight: 600;
+  font-variant-numeric: lining-nums;
+  line-height: 0.76;
+}
+
+.final-route span {
+  color: rgba(52, 31, 22, 0.76);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-family: Constantia, "Bodoni MT", "Bodoni 72", Didot, Georgia, serif;
+  font-size: 0.86rem;
+  font-weight: 700;
+  font-variant-caps: small-caps;
 }
 
 .quiz-page,
@@ -2475,6 +2671,18 @@ img {
 
   .hero-copy {
     padding-top: 0;
+    padding-bottom: 5.25rem;
+  }
+
+  .hero-scroll-cue {
+    bottom: 1.1rem;
+    width: min(16rem, calc(100vw - 2rem));
+    font-size: 0.64rem;
+  }
+
+  .hero-scroll-cue svg {
+    width: 1.35rem;
+    height: 1.35rem;
   }
 
   .story-section {
@@ -2528,15 +2736,36 @@ img {
   }
 
   .final-seal {
-    border-radius: 0.45rem;
+    grid-template-columns: 1fr;
+    min-height: auto;
+    gap: 2rem;
+    padding-block: 2.5rem;
   }
 
   .final-constellation {
-    position: relative;
-    top: auto;
-    right: auto;
-    margin-bottom: 1.5rem;
-    width: 7rem;
+    top: 1rem;
+    right: -4rem;
+    width: 14rem;
+    transform: none;
+  }
+
+  .final-copy h2 {
+    max-width: 8ch;
+    font-size: clamp(3rem, 17vw, 5.4rem);
+  }
+
+  .final-route div {
+    padding-inline: 0;
+  }
+
+  .final-route {
+    justify-self: stretch;
+    width: 100%;
+    margin-top: 1.75rem;
+  }
+
+  .final-route::after {
+    width: 34%;
   }
 
   .atlas-map-window {
