@@ -5,34 +5,51 @@ import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { useEffect, useRef } from "react";
+import type { MouseEvent, PointerEvent } from "react";
 import { PHILOSOPHER_BY_ID } from "@/lib/philosophers";
 import type { PhilosopherId } from "@/lib/types";
 
 const chapters = [
   {
     title: "What is philosophy?",
-    text: "Not trivia, but a way of asking what reality is, how people know it, and why life should be lived one way rather than another.",
+    answer:
+      "A disciplined way of asking what is real, what can be known, and what kind of life deserves your loyalty.",
+    note: "The quiz begins with the habit behind every answer: how you decide what deserves to be called true.",
+    signal: "Truth, value, method",
     mark: "I"
   },
   {
     title: "Matter and consciousness",
-    text: "The old question returns: do ideas rule life, or does material life give ideas their shape?",
+    answer:
+      "The old divide between thought and world: whether ideas command history, or material life gives ideas their shape.",
+    note: "This is where worldview becomes a map: spirit, nature, labor, memory, and the conditions that shape thought.",
+    signal: "Worldview, labor, perception",
     mark: "II"
   },
   {
     title: "Contradiction and development",
-    text: "A world in motion is not explained by still categories. Contradictions pressure things to become otherwise.",
+    answer:
+      "A world in motion cannot be understood by still categories. Tension is often the pressure by which things become otherwise.",
+    note: "Here the test listens for whether you see conflict as error, tragedy, discipline, or the engine of change.",
+    signal: "Movement, negation, change",
     mark: "III"
   },
   {
     title: "Society, class, and the state",
-    text: "The self is never floating alone. Work, power, institutions, and shared history write themselves into private life.",
+    answer:
+      "No self floats alone. Work, power, institutions, and shared history write themselves into private life.",
+    note: "Your answers start to reveal how you read authority: as order, alienation, duty, violence, or collective form.",
+    signal: "Power, history, collective life",
     mark: "IV"
   },
   {
     title: "Human beings and liberation",
-    text: "The final question is personal: what kind of freedom do your answers keep trying to defend?",
+    answer:
+      "The final question is personal: what kind of freedom do your answers keep trying to defend?",
+    note: "By the end, the result is less a label than a portrait of the freedom you keep returning to.",
+    signal: "Freedom, responsibility, becoming",
     mark: "V"
   }
 ];
@@ -54,6 +71,36 @@ const timelinePhilosophers: PhilosopherId[] = [
 
 export function LandingExperience() {
   const rootRef = useRef<HTMLElement>(null);
+  const pathSectionRef = useRef<HTMLElement>(null);
+  const lenisRef = useRef<Lenis | null>(null);
+
+  const handlePathPointerMove = (event: PointerEvent<HTMLElement>) => {
+    const section = event.currentTarget;
+    const rect = section.getBoundingClientRect();
+    section.style.setProperty("--grid-x", `${event.clientX - rect.left}px`);
+    section.style.setProperty("--grid-y", `${event.clientY - rect.top}px`);
+    section.classList.add("is-grid-active");
+  };
+
+  const handlePathPointerLeave = () => {
+    pathSectionRef.current?.classList.remove("is-grid-active");
+  };
+
+  const handleRevealPathClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    const pathSection = pathSectionRef.current;
+    if (!pathSection) return;
+
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(pathSection, {
+        duration: 1.65,
+        easing: (t: number) => 1 - Math.pow(1 - t, 4)
+      });
+      return;
+    }
+
+    pathSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -61,6 +108,7 @@ export function LandingExperience() {
 
     gsap.registerPlugin(ScrollTrigger);
     const lenis = new Lenis({ lerp: 0.08, wheelMultiplier: 0.9 });
+    lenisRef.current = lenis;
     let frame = 0;
 
     const raf = (time: number) => {
@@ -82,7 +130,8 @@ export function LandingExperience() {
         })
         .to(".hero-video", { scale: 1.16, filter: "sepia(0.55) saturate(0.72) brightness(0.62)", ease: "none" }, 0)
         .to(".video-vignette", { opacity: 0.86, ease: "none" }, 0)
-        .to(".hero-copy", { y: -80, opacity: 0, ease: "none" }, 0.18);
+        .to(".hero-copy", { y: -80, opacity: 0, ease: "none" }, 0.18)
+        .to(".hero-scroll-cue", { y: 38, opacity: 0, ease: "none" }, 0.1);
 
       gsap.utils.toArray<HTMLElement>(".story-card").forEach((card) => {
         gsap.fromTo(
@@ -139,9 +188,9 @@ export function LandingExperience() {
       });
 
       gsap.to(".landing-shell", {
-        "--paper-warmth": "#2d1711",
-        "--ink": "#fff2d2",
-        "--accent": "#f1b35a",
+        "--paper-warmth": "#f7e6bd",
+        "--ink": "#24140f",
+        "--accent": "#9f241c",
         scrollTrigger: {
           trigger: ".final-scroll",
           start: "top 70%",
@@ -150,28 +199,73 @@ export function LandingExperience() {
         }
       });
 
-      gsap.fromTo(
-        ".final-seal",
-        { scale: 0.74, rotate: -8, opacity: 0 },
-        {
-          scale: 1,
-          rotate: 0,
-          opacity: 1,
-          ease: "back.out(1.4)",
-          scrollTrigger: {
-            trigger: ".final-scroll",
-            start: "top 60%",
-            end: "top 20%",
-            scrub: 1
-          }
+      const finalReveal = gsap.timeline({
+        defaults: { ease: "power3.out" },
+        scrollTrigger: {
+          trigger: ".final-scroll",
+          start: "top 58%",
+          toggleActions: "play none none reverse"
         }
-      );
+      });
+
+      finalReveal
+        .from(".final-seal", { autoAlpha: 0, y: 28, duration: 0.7 })
+        .from(
+          ".final-copy > span",
+          {
+            autoAlpha: 0,
+            clipPath: "inset(0 100% 0 0)",
+            x: -18,
+            duration: 0.62
+          },
+          "-=0.35"
+        )
+        .from(
+          ".final-copy h2",
+          {
+            autoAlpha: 0,
+            clipPath: "inset(0 0 100% 0)",
+            yPercent: 10,
+            duration: 0.82
+          },
+          "-=0.36"
+        )
+        .from(
+          [".final-seal p", ".final-cta"],
+          {
+            autoAlpha: 0,
+            y: 20,
+            duration: 0.58,
+            stagger: 0.12
+          },
+          "-=0.32"
+        )
+        .from(
+          ".final-route",
+          {
+            autoAlpha: 0,
+            x: 34,
+            duration: 0.68
+          },
+          "-=0.58"
+        )
+        .from(
+          ".final-route div",
+          {
+            autoAlpha: 0,
+            x: 22,
+            duration: 0.46,
+            stagger: 0.1
+          },
+          "-=0.42"
+        );
     }, rootRef);
 
     return () => {
       context.revert();
       cancelAnimationFrame(frame);
       lenis.destroy();
+      lenisRef.current = null;
     };
   }, []);
 
@@ -207,20 +301,23 @@ export function LandingExperience() {
               Walk through a parchment map of ideas, contradiction, society, power, and freedom. At the end,
               your answers are scored against twelve thinkers from Plato to Marx, Lenin, Beauvoir, Laozi, and Sartre.
             </p>
-            <div className="hero-actions">
-              <Link className="primary-cta" href="/quiz">
-                Take the Test
-              </Link>
-              <a className="secondary-cta" href="#story">
-                Enter the scroll
-              </a>
-            </div>
           </div>
+          <a className="hero-scroll-cue" href="#path" onClick={handleRevealPathClick}>
+            <span>Reveal the path</span>
+            <ChevronDown aria-hidden="true" />
+          </a>
         </div>
       </section>
 
-      <section className="philosopher-path-section" aria-label="Connected philosopher timeline">
-        <div className="path-texture" aria-hidden="true" />
+      <section
+        id="path"
+        ref={pathSectionRef}
+        className="philosopher-path-section"
+        aria-label="Connected philosopher timeline"
+        onPointerLeave={handlePathPointerLeave}
+        onPointerMove={handlePathPointerMove}
+      >
+        <div className="path-grid-texture" aria-hidden="true" />
         <div className="path-intro">
           <span>Follow the line</span>
           <h2>A path of thinkers across the map</h2>
@@ -231,7 +328,7 @@ export function LandingExperience() {
         </div>
         <div className="philosopher-path">
           <div className="route-thread" aria-hidden="true" />
-          {timelinePhilosophers.map((id, index) => {
+          {timelinePhilosophers.map((id) => {
             const philosopher = PHILOSOPHER_BY_ID[id];
             return (
               <article className="philosopher-node" key={id}>
@@ -239,11 +336,10 @@ export function LandingExperience() {
                   <Image
                     alt={`${philosopher.name} portrait`}
                     height={680}
-                    src={philosopher.portraitUrl}
+                    src={philosopher.cutoutUrl}
                     unoptimized
                     width={520}
                   />
-                  <span>{String(index + 1).padStart(2, "0")}</span>
                 </div>
                 <div className="node-copy">
                   <p className="node-era">{philosopher.era}</p>
@@ -258,29 +354,53 @@ export function LandingExperience() {
       </section>
 
       <section id="story" className="story-section" aria-label="Philosophy story chapters">
-        {chapters.map((chapter, index) => (
-          <article className="story-card" key={chapter.title}>
-            <span className="chapter-mark">{chapter.mark}</span>
-            <div>
-              <h2>{chapter.title}</h2>
-              <p>{chapter.text}</p>
-              <span className="chapter-rule">Scroll depth {index + 1}/5</span>
-            </div>
-          </article>
-        ))}
+        <div className="story-track">
+          {chapters.map((chapter, index) => (
+            <article className="story-card" key={chapter.title}>
+              <div className="chapter-title-side">
+                <span className="chapter-rule">Chapter {String(index + 1).padStart(2, "0")}</span>
+                <span className="chapter-mark">{chapter.mark}</span>
+                <h2>{chapter.title}</h2>
+              </div>
+              <div className="chapter-answer-side">
+                <span>{chapter.signal}</span>
+                <p className="chapter-answer">{chapter.answer}</p>
+                <p className="chapter-note">{chapter.note}</p>
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="final-scroll">
         <div className="final-seal">
-          <span>The map closes.</span>
-          <h2>Your answers become a philosophical portrait.</h2>
-          <p>
-            Thirty questions. Six hidden axes. One dominant match, three neighboring thinkers, quotes, and
-            reflective commentary shaped by your result.
-          </p>
-          <Link className="primary-cta large" href="/quiz">
-            Take the Test
-          </Link>
+          <div className="final-constellation" aria-hidden="true" />
+          <div className="final-copy">
+            <span>The atlas resolves</span>
+            <h2>Find the thinker your answers have been tracing.</h2>
+            <p>
+              Open a scored result with your closest philosopher, neighboring influences, selected quotes,
+              and a short reflection on the pattern behind your choices.
+            </p>
+            <Link className="primary-cta large final-cta" href="/quiz">
+              Take the Test
+              <ArrowRight aria-hidden="true" />
+            </Link>
+          </div>
+          <div className="final-route" aria-label="Result summary">
+            <div>
+              <strong>30</strong>
+              <span>questions</span>
+            </div>
+            <div>
+              <strong>6</strong>
+              <span>hidden axes</span>
+            </div>
+            <div>
+              <strong>12</strong>
+              <span>thinkers</span>
+            </div>
+          </div>
         </div>
       </section>
     </main>

@@ -3,18 +3,33 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { startTransition, useState } from "react";
+import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { QUESTIONS } from "@/lib/quiz-data";
 import type { SubmittedAnswer } from "@/lib/types";
+
+const axisLabels = {
+  materialism: "Material life",
+  dialectics: "Contradiction",
+  individual_society: "Self and society",
+  authority_power: "Power",
+  ethics_action: "Action",
+  freedom_alienation: "Freedom"
+} as const;
+
+type QuizDirection = "idle" | "next" | "previous";
 
 export function QuizClient() {
   const router = useRouter();
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState<QuizDirection>("idle");
   const [error, setError] = useState("");
   const [isSubmitting, setSubmitting] = useState(false);
   const current = QUESTIONS[currentIndex];
   const answeredCount = Object.keys(answers).length;
   const isComplete = answeredCount === QUESTIONS.length;
+  const progressPercent = ((currentIndex + 1) / QUESTIONS.length) * 100;
 
   function selectAnswer(answerId: string) {
     setAnswers((previous) => ({ ...previous, [current.id]: answerId }));
@@ -28,6 +43,13 @@ export function QuizClient() {
     }
 
     setCurrentIndex((index) => Math.min(index + 1, QUESTIONS.length - 1));
+    setDirection("next");
+    setError("");
+  }
+
+  function goPrevious() {
+    setDirection("previous");
+    setCurrentIndex((index) => Math.max(index - 1, 0));
     setError("");
   }
 
@@ -71,74 +93,84 @@ export function QuizClient() {
     <main className="quiz-page">
       <div className="quiz-map" aria-hidden="true" />
       <header className="quiz-header">
-        <Link className="text-link" href="/">
+        <Link className="text-link quiz-return-link" href="/">
           Return to landing
         </Link>
-        <span>
-          {answeredCount}/{QUESTIONS.length} answered
-        </span>
+        <div className="quiz-top-progress" aria-hidden="true">
+          <span style={{ width: `${progressPercent}%` }} />
+        </div>
       </header>
 
-      <section className="quiz-panel">
-        <div className="progress-track" aria-hidden="true">
-          <span style={{ width: `${(answeredCount / QUESTIONS.length) * 100}%` }} />
-        </div>
-        <p className="question-context">{current.context}</p>
-        <h1>{current.prompt}</h1>
-        <div className="answer-grid" role="radiogroup" aria-label={current.prompt}>
-          {current.answers.map((answer) => {
-            const selected = answers[current.id] === answer.id;
-            return (
-              <button
-                aria-checked={selected}
-                className={selected ? "answer-card selected" : "answer-card"}
-                key={answer.id}
-                onClick={() => selectAnswer(answer.id)}
-                role="radio"
+      <div className="quiz-stage">
+        <section className={`quiz-panel quiz-panel--${direction}`} key={current.id}>
+          <div className="question-topline">
+            <span>
+              {currentIndex + 1}/{QUESTIONS.length}
+            </span>
+            <span>{axisLabels[current.axis]}</span>
+          </div>
+          <h1>{current.prompt}</h1>
+          <p className="question-context">{current.context}</p>
+          <div className="answer-grid" role="radiogroup" aria-label={current.prompt}>
+            {current.answers.map((answer) => {
+              const selected = answers[current.id] === answer.id;
+              return (
+                <Button
+                  aria-checked={selected}
+                  className={selected ? "answer-card selected" : "answer-card"}
+                  key={answer.id}
+                  onClick={() => selectAnswer(answer.id)}
+                  role="radio"
+                  type="button"
+                  variant="outline"
+                >
+                  <span className="answer-letter">{answer.id.toUpperCase()}</span>
+                  <span className="answer-copy">{answer.text}</span>
+                  <span className="answer-signal" aria-hidden="true" />
+                </Button>
+              );
+            })}
+          </div>
+
+          {error ? <p className="form-error">{error}</p> : null}
+
+          <footer className="quiz-controls">
+            <Button
+              className="quiz-action-button quiz-action-button--secondary"
+              disabled={currentIndex === 0}
+              onClick={goPrevious}
+              size="lg"
+              type="button"
+              variant="outline"
+            >
+              <ArrowLeft aria-hidden="true" data-icon="inline-start" />
+              Previous
+            </Button>
+            {currentIndex < QUESTIONS.length - 1 ? (
+              <Button
+                className="quiz-action-button quiz-action-button--primary"
+                onClick={goNext}
+                size="lg"
                 type="button"
               >
-                <span>{answer.id.toUpperCase()}</span>
-                {answer.text}
-              </button>
-            );
-          })}
-        </div>
-
-        {error ? <p className="form-error">{error}</p> : null}
-
-        <footer className="quiz-controls">
-          <button
-            className="secondary-cta"
-            disabled={currentIndex === 0}
-            onClick={() => setCurrentIndex((index) => Math.max(index - 1, 0))}
-            type="button"
-          >
-            Previous
-          </button>
-          {currentIndex < QUESTIONS.length - 1 ? (
-            <button className="primary-cta" onClick={goNext} type="button">
-              Next question
-            </button>
-          ) : (
-            <button className="primary-cta" disabled={isSubmitting} onClick={submitQuiz} type="button">
-              {isSubmitting ? "Reading the archive..." : "Reveal my philosopher"}
-            </button>
-          )}
-        </footer>
-      </section>
-
-      <aside className="quiz-index" aria-label="Question navigation">
-        {QUESTIONS.map((question, index) => (
-          <button
-            className={index === currentIndex ? "current" : answers[question.id] ? "answered" : ""}
-            key={question.id}
-            onClick={() => setCurrentIndex(index)}
-            type="button"
-          >
-            {index + 1}
-          </button>
-        ))}
-      </aside>
+                Next question
+                <ArrowRight aria-hidden="true" data-icon="inline-end" />
+              </Button>
+            ) : (
+              <Button
+                className="quiz-action-button quiz-action-button--primary"
+                disabled={isSubmitting}
+                onClick={submitQuiz}
+                size="lg"
+                type="button"
+              >
+                <Sparkles aria-hidden="true" data-icon="inline-start" />
+                {isSubmitting ? "Reading the archive..." : "Reveal my philosopher"}
+              </Button>
+            )}
+          </footer>
+        </section>
+      </div>
     </main>
   );
 }
