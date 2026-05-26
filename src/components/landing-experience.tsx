@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
@@ -70,9 +71,13 @@ const timelinePhilosophers: PhilosopherId[] = [
 ];
 
 export function LandingExperience() {
+  const router = useRouter();
   const rootRef = useRef<HTMLElement>(null);
   const pathSectionRef = useRef<HTMLElement>(null);
   const lenisRef = useRef<Lenis | null>(null);
+  const transitionTimeoutRef = useRef<number | null>(null);
+
+  const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const handlePathPointerMove = (event: PointerEvent<HTMLElement>) => {
     const section = event.currentTarget;
@@ -91,7 +96,9 @@ export function LandingExperience() {
     const pathSection = pathSectionRef.current;
     if (!pathSection) return;
 
-    if (lenisRef.current) {
+    const shouldReduceMotion = prefersReducedMotion();
+
+    if (!shouldReduceMotion && lenisRef.current) {
       lenisRef.current.scrollTo(pathSection, {
         duration: 1.65,
         easing: (t: number) => 1 - Math.pow(1 - t, 4)
@@ -99,12 +106,39 @@ export function LandingExperience() {
       return;
     }
 
-    pathSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    pathSection.scrollIntoView({ behavior: shouldReduceMotion ? "auto" : "smooth", block: "start" });
+  };
+
+  const handlePhilosopherPageClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return;
+    }
+
+    const href = event.currentTarget.getAttribute("href") ?? "/philosophers";
+    event.preventDefault();
+
+    if (prefersReducedMotion()) {
+      router.push(href);
+      return;
+    }
+
+    const root = rootRef.current;
+    if (!root) {
+      router.push(href);
+      return;
+    }
+
+    root.style.setProperty("--transition-x", `${event.clientX}px`);
+    root.style.setProperty("--transition-y", `${event.clientY}px`);
+    root.classList.add("is-page-exiting");
+
+    transitionTimeoutRef.current = window.setTimeout(() => {
+      router.push(href);
+    }, 560);
   };
 
   useEffect(() => {
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion()) return;
 
     gsap.registerPlugin(ScrollTrigger);
     const lenis = new Lenis({ lerp: 0.08, wheelMultiplier: 0.9 });
@@ -269,6 +303,14 @@ export function LandingExperience() {
     };
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (transitionTimeoutRef.current) {
+        window.clearTimeout(transitionTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <main ref={rootRef} className="landing-shell">
       <div className="map-noise" aria-hidden="true" />
@@ -290,6 +332,7 @@ export function LandingExperience() {
           <nav className="top-nav" aria-label="Main navigation">
             <span className="brand-mark">Philosopher Atlas</span>
             <div>
+              <Link href="/philosophers">Philosophers</Link>
               <Link href="/quiz">Quiz</Link>
               <Link href="/credits">Credits</Link>
             </div>
@@ -332,7 +375,12 @@ export function LandingExperience() {
             const philosopher = PHILOSOPHER_BY_ID[id];
             return (
               <article className="philosopher-node" key={id}>
-                <div className="node-portrait">
+                <Link
+                  aria-label={`Explore ${philosopher.name}`}
+                  className="node-portrait philosopher-portrait-link"
+                  href={`/philosophers/${id}`}
+                  onClick={handlePhilosopherPageClick}
+                >
                   <Image
                     alt={`${philosopher.name} portrait`}
                     height={680}
@@ -340,7 +388,7 @@ export function LandingExperience() {
                     unoptimized
                     width={520}
                   />
-                </div>
+                </Link>
                 <div className="node-copy">
                   <p className="node-era">{philosopher.era}</p>
                   <h3>{philosopher.name}</h3>

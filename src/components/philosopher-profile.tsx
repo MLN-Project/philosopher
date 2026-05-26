@@ -1,0 +1,201 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ArrowLeft, ArrowRight, BookOpen, Quote } from "lucide-react";
+import { useEffect, useRef } from "react";
+import type { CSSProperties } from "react";
+import { archiveDetails, archiveOrder, archiveThreads } from "@/lib/philosopher-archive";
+import { PHILOSOPHER_BY_ID } from "@/lib/philosophers";
+import type { PhilosopherId } from "@/lib/types";
+
+type PhilosopherProfileProps = {
+  philosopherId: PhilosopherId;
+};
+
+export function PhilosopherProfile({ philosopherId }: PhilosopherProfileProps) {
+  const rootRef = useRef<HTMLElement>(null);
+  const philosopher = PHILOSOPHER_BY_ID[philosopherId];
+  const detail = archiveDetails[philosopherId];
+  const index = archiveOrder.indexOf(philosopherId);
+  const previousId = archiveOrder[(index - 1 + archiveOrder.length) % archiveOrder.length];
+  const nextId = archiveOrder[(index + 1) % archiveOrder.length];
+  const relatedThreads = archiveThreads.filter((thread) => thread.ids.includes(philosopherId));
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const context = gsap.context(() => {
+      gsap.fromTo(
+        ".profile-nav",
+        { autoAlpha: 0, y: -18 },
+        { autoAlpha: 1, y: 0, duration: 0.58, ease: "power3.out" }
+      );
+
+      gsap.fromTo(
+        ".profile-hero-copy > *",
+        { autoAlpha: 0, y: 30 },
+        { autoAlpha: 1, y: 0, duration: 0.72, stagger: 0.09, ease: "power3.out" }
+      );
+
+      gsap.fromTo(
+        ".profile-portrait-stage",
+        { autoAlpha: 0, y: 42, scale: 0.96 },
+        { autoAlpha: 1, y: 0, scale: 1, duration: 0.86, ease: "power3.out" }
+      );
+
+      gsap.to(".profile-portrait-stage img", {
+        yPercent: -5,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".profile-hero",
+          start: "top top",
+          end: "bottom top",
+          scrub: true
+        }
+      });
+
+      gsap.utils.toArray<HTMLElement>(".profile-reveal").forEach((section) => {
+        gsap.fromTo(
+          section,
+          { autoAlpha: 0, y: 46 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.68,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: section,
+              start: "top 78%",
+              toggleActions: "play none none reverse"
+            }
+          }
+        );
+      });
+    }, rootRef);
+
+    return () => context.revert();
+  }, []);
+
+  return (
+    <main
+      ref={rootRef}
+      className="philosopher-profile"
+      style={{ "--archive-color": philosopher.color } as CSSProperties}
+    >
+      <div className="archive-paper-grain" aria-hidden="true" />
+      <nav className="profile-nav" aria-label={`${philosopher.name} navigation`}>
+        <Link className="brand-mark" href="/">
+          Philosopher Atlas
+        </Link>
+        <div>
+          <Link href="/philosophers">Philosophers</Link>
+          <Link href="/quiz">Quiz</Link>
+          <Link href="/credits">Credits</Link>
+        </div>
+      </nav>
+
+      <section className="profile-hero" aria-label={`${philosopher.name} profile`}>
+        <div className="profile-hero-copy">
+          <span>{detail.life} / {detail.place}</span>
+          <h1>{philosopher.name}</h1>
+          <p className="profile-era">{philosopher.era}</p>
+          <p>{philosopher.description}</p>
+          <div className="profile-hero-actions">
+            <Link className="primary-cta" href="#history">
+              Read history
+              <ArrowRight aria-hidden="true" />
+            </Link>
+            <Link className="secondary-cta" href="/philosophers">
+              Full index
+            </Link>
+          </div>
+        </div>
+
+        <div className="profile-portrait-stage" aria-hidden="true">
+          <Image
+            alt=""
+            height={780}
+            src={philosopher.cutoutUrl}
+            unoptimized
+            width={580}
+          />
+        </div>
+      </section>
+
+      <section className="profile-quote-band profile-reveal" aria-label={`${philosopher.name} quote`}>
+        <Quote aria-hidden="true" />
+        <blockquote>{philosopher.quote}</blockquote>
+        <cite>{philosopher.quoteNote}</cite>
+      </section>
+
+      <section id="history" className="profile-history-section profile-reveal" aria-label={`${philosopher.name} history`}>
+        <div className="profile-section-heading">
+          <span>History</span>
+          <h2>The pressure behind the thought</h2>
+        </div>
+        <div className="profile-history-copy">
+          <p>{detail.history}</p>
+          <p>{detail.legacy}</p>
+        </div>
+      </section>
+
+      <section className="profile-detail-grid profile-reveal" aria-label={`${philosopher.name} ideas and reading`}>
+        <div className="profile-idea-panel">
+          <span>Core ideas</span>
+          <div>
+            {detail.ideas.map((idea) => (
+              <Link href={`/philosophers/${philosopherId}#history`} key={idea}>
+                {idea}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="profile-reading-panel">
+          <BookOpen aria-hidden="true" />
+          <span>Start with</span>
+          <h2>{detail.primaryWork}</h2>
+          <p>{detail.archiveNote}</p>
+        </div>
+      </section>
+
+      <section className="profile-thread-section profile-reveal" aria-label={`${philosopher.name} philosophical threads`}>
+        <div className="profile-section-heading">
+          <span>Threads</span>
+          <h2>Where this thinker sits on the map</h2>
+        </div>
+        <div className="profile-thread-list">
+          {relatedThreads.map((thread) => (
+            <article className="profile-thread-item" key={thread.title}>
+              <h3>{thread.title}</h3>
+              <p>{thread.copy}</p>
+              <div>
+                {thread.ids.map((id) => (
+                  <Link href={`/philosophers/${id}`} key={id}>
+                    {PHILOSOPHER_BY_ID[id].name}
+                  </Link>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="profile-next-section profile-reveal" aria-label="Neighboring philosophers">
+        <Link href={`/philosophers/${previousId}`}>
+          <ArrowLeft aria-hidden="true" />
+          <span>{PHILOSOPHER_BY_ID[previousId].name}</span>
+        </Link>
+        <Link href={`/philosophers/${nextId}`}>
+          <span>{PHILOSOPHER_BY_ID[nextId].name}</span>
+          <ArrowRight aria-hidden="true" />
+        </Link>
+      </section>
+    </main>
+  );
+}

@@ -1,6 +1,6 @@
 # Philosopher Personality
 
-An interactive Next.js personality quiz inspired by MBTI-style matching and the MLN111 Philosophy of Marxism-Leninism syllabus. The app combines a cinematic parchment-map landing page, a 30-question quiz, deterministic philosopher scoring, Supabase persistence, and OpenAI-generated reflective commentary.
+An interactive Next.js personality quiz inspired by MBTI-style matching and the MLN111 Philosophy of Marxism-Leninism syllabus. The app combines a cinematic parchment-map landing page, a 30-question quiz, deterministic philosopher scoring, Supabase persistence, and hand-authored reflective commentary for each top philosopher.
 
 ## Environment
 
@@ -9,11 +9,9 @@ Create `.env.local` for provider-backed features:
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
-OPENAI_API_KEY=
-OPENAI_MODEL=gpt-4.1-mini
 ```
 
-Without these variables, local development still works with in-memory result storage and deterministic fallback commentary.
+Without these variables, local development still works with in-memory result storage and the same static philosopher commentary.
 
 ## Supabase Tables
 

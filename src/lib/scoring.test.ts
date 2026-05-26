@@ -43,7 +43,7 @@ describe("scoreQuiz", () => {
 });
 
 describe("parseAiCommentary", () => {
-  it("rejects invalid OpenAI commentary shape", () => {
+  it("rejects invalid commentary shape", () => {
     expect(() => parseAiCommentary({ summary: "too short" })).toThrow();
   });
 });

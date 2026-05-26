@@ -8,6 +8,7 @@ export type Philosopher = {
   color: string;
   portraitUrl: string;
   cutoutUrl: string;
+  sourceUrl: string;
   quote: string;
   quoteNote: string;
   description: string;
@@ -23,6 +24,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     color: "#8f241d",
     portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Karl_Marx.jpg",
     cutoutUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Karl_Marx.png",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Karl_Marx.jpg",
     quote: "The philosophers have only interpreted the world; the point is to change it.",
     quoteNote: "Theses on Feuerbach",
     description:
@@ -37,6 +39,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     color: "#9c4a22",
     portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Friedrich_Engels_portrait_(cropped).jpg",
     cutoutUrl: "/images/sources/engels-source.jpg",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Friedrich_Engels_portrait_(cropped).jpg",
     quote: "Freedom is the recognition of necessity.",
     quoteNote: "Anti-Duhring",
     description:
@@ -51,6 +54,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     color: "#a62f1f",
     portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Vladimir_Lenin.jpg",
     cutoutUrl: "/images/sources/lenin-source.jpg",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Vladimir_Lenin.jpg",
     quote: "Without revolutionary theory there can be no revolutionary movement.",
     quoteNote: "What Is To Be Done?",
     description:
@@ -65,6 +69,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     color: "#73552a",
     portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Hegel_portrait_by_Schlesinger_1831.jpg",
     cutoutUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/G.W.F._Hegel_(by_Sichling,_after_Sebbers).jpg",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Hegel_portrait_by_Schlesinger_1831.jpg",
     quote: "The truth is the whole.",
     quoteNote: "Phenomenology of Spirit",
     description:
@@ -79,6 +84,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     color: "#986735",
     portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Feuerbach_Ludwig.jpg",
     cutoutUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Feuerbach_Ludwig_retouched.jpg",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Feuerbach_Ludwig.jpg",
     quote: "Man is what he eats.",
     quoteNote: "Attributed summary of his materialism",
     description:
@@ -94,6 +100,8 @@ export const PHILOSOPHERS: Philosopher[] = [
     portraitUrl:
       "https://commons.wikimedia.org/wiki/Special:FilePath/Naples-_National_Museum,_Plato,_bronze_bust_(Herculaneum,_1759),_No._5274_(SM_stf1507).png",
     cutoutUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Plato_(transparent).png",
+    sourceUrl:
+      "https://commons.wikimedia.org/wiki/File:Naples-_National_Museum,_Plato,_bronze_bust_(Herculaneum,_1759),_No._5274_(SM_stf1507).png",
     quote: "The beginning is the most important part of the work.",
     quoteNote: "Republic",
     description:
@@ -108,6 +116,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     color: "#7f6b32",
     portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Aristotle_bust.jpg",
     cutoutUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Aristotle_(transparent).png",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Aristotle_bust.jpg",
     quote: "We are what we repeatedly do.",
     quoteNote: "Common paraphrase of Nicomachean Ethics",
     description:
@@ -122,6 +131,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     color: "#684039",
     portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Nietzsche1882.jpg",
     cutoutUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Friedrich_Nietzsche_(transparent).png",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Nietzsche1882.jpg",
     quote: "Become who you are.",
     quoteNote: "Pindar line Nietzsche repeatedly invokes",
     description:
@@ -136,6 +146,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     color: "#7b4f28",
     portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/孔子燕居像.png",
     cutoutUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Ma_Yuan-Confucius.png",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:%E5%AD%94%E5%AD%90%E7%87%95%E5%B1%85%E5%83%8F.png",
     quote: "To study and at due times practice what one has studied, is this not a pleasure?",
     quoteNote: "Analects",
     description:
@@ -150,6 +161,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     color: "#5f6f42",
     portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Lao_Tzu.png",
     cutoutUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Lao_Tzu.png",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Lao_Tzu.png",
     quote: "A journey of a thousand miles begins beneath one's feet.",
     quoteNote: "Dao De Jing",
     description:
@@ -164,6 +176,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     color: "#6a3e4d",
     portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Simone_de_Beauvoir_1967_(cropped).jpg",
     cutoutUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Simone_de_Beauvoir2.png",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Simone_de_Beauvoir_1967_(cropped).jpg",
     quote: "One is not born, but rather becomes, woman.",
     quoteNote: "The Second Sex",
     description:
@@ -178,6 +191,7 @@ export const PHILOSOPHERS: Philosopher[] = [
     color: "#4b4b3c",
     portraitUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Jean_Paul_Sartre_1965_(cropped).jpg",
     cutoutUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Jean_Paul_Sartre_1965_(cropped).jpg",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:Jean_Paul_Sartre_1965_(cropped).jpg",
     quote: "Existence precedes essence.",
     quoteNote: "Existentialism Is a Humanism",
     description:

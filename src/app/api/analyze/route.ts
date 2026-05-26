@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { generateAiCommentary } from "@/lib/ai";
+import { getStaticCommentary } from "@/lib/static-commentary";
 import { getQuizSession, persistCommentary } from "@/lib/storage";
 
 const analyzeSchema = z.object({
@@ -16,11 +16,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Result not found." }, { status: 404 });
     }
 
-    if (session.commentary) {
-      return NextResponse.json(session.commentary);
-    }
-
-    const commentary = await generateAiCommentary(session);
+    const commentary = getStaticCommentary(session);
     await persistCommentary(sessionId, commentary);
 
     return NextResponse.json(commentary);
