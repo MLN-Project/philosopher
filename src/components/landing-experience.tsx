@@ -13,27 +13,42 @@ import type { PhilosopherId } from "@/lib/types";
 const chapters = [
   {
     title: "What is philosophy?",
-    text: "Not trivia, but a way of asking what reality is, how people know it, and why life should be lived one way rather than another.",
+    answer:
+      "A disciplined way of asking what is real, what can be known, and what kind of life deserves your loyalty.",
+    note: "The quiz begins with the habit behind every answer: how you decide what deserves to be called true.",
+    signal: "Truth, value, method",
     mark: "I"
   },
   {
     title: "Matter and consciousness",
-    text: "The old question returns: do ideas rule life, or does material life give ideas their shape?",
+    answer:
+      "The old divide between thought and world: whether ideas command history, or material life gives ideas their shape.",
+    note: "This is where worldview becomes a map: spirit, nature, labor, memory, and the conditions that shape thought.",
+    signal: "Worldview, labor, perception",
     mark: "II"
   },
   {
     title: "Contradiction and development",
-    text: "A world in motion is not explained by still categories. Contradictions pressure things to become otherwise.",
+    answer:
+      "A world in motion cannot be understood by still categories. Tension is often the pressure by which things become otherwise.",
+    note: "Here the test listens for whether you see conflict as error, tragedy, discipline, or the engine of change.",
+    signal: "Movement, negation, change",
     mark: "III"
   },
   {
     title: "Society, class, and the state",
-    text: "The self is never floating alone. Work, power, institutions, and shared history write themselves into private life.",
+    answer:
+      "No self floats alone. Work, power, institutions, and shared history write themselves into private life.",
+    note: "Your answers start to reveal how you read authority: as order, alienation, duty, violence, or collective form.",
+    signal: "Power, history, collective life",
     mark: "IV"
   },
   {
     title: "Human beings and liberation",
-    text: "The final question is personal: what kind of freedom do your answers keep trying to defend?",
+    answer:
+      "The final question is personal: what kind of freedom do your answers keep trying to defend?",
+    note: "By the end, the result is less a label than a portrait of the freedom you keep returning to.",
+    signal: "Freedom, responsibility, becoming",
     mark: "V"
   }
 ];
@@ -277,20 +292,27 @@ export function LandingExperience() {
       </section>
 
       <section id="story" className="story-section" aria-label="Philosophy story chapters">
-        {chapters.map((chapter, index) => (
-          <article className="story-card" key={chapter.title}>
-            <span className="chapter-mark">{chapter.mark}</span>
-            <div>
-              <h2>{chapter.title}</h2>
-              <p>{chapter.text}</p>
-              <span className="chapter-rule">Scroll depth {index + 1}/5</span>
-            </div>
-          </article>
-        ))}
+        <div className="story-track">
+          {chapters.map((chapter, index) => (
+            <article className="story-card" key={chapter.title}>
+              <div className="chapter-title-side">
+                <span className="chapter-rule">Chapter {String(index + 1).padStart(2, "0")}</span>
+                <span className="chapter-mark">{chapter.mark}</span>
+                <h2>{chapter.title}</h2>
+              </div>
+              <div className="chapter-answer-side">
+                <span>{chapter.signal}</span>
+                <p className="chapter-answer">{chapter.answer}</p>
+                <p className="chapter-note">{chapter.note}</p>
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="final-scroll">
         <div className="final-seal">
+          <div className="final-constellation" aria-hidden="true" />
           <span>The map closes.</span>
           <h2>Your answers become a philosophical portrait.</h2>
           <p>

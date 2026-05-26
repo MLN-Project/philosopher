@@ -17,10 +17,13 @@ const axisLabels = {
   freedom_alienation: "Freedom"
 } as const;
 
+type QuizDirection = "idle" | "next" | "previous";
+
 export function QuizClient() {
   const router = useRouter();
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState<QuizDirection>("idle");
   const [error, setError] = useState("");
   const [isSubmitting, setSubmitting] = useState(false);
   const current = QUESTIONS[currentIndex];
@@ -40,6 +43,13 @@ export function QuizClient() {
     }
 
     setCurrentIndex((index) => Math.min(index + 1, QUESTIONS.length - 1));
+    setDirection("next");
+    setError("");
+  }
+
+  function goPrevious() {
+    setDirection("previous");
+    setCurrentIndex((index) => Math.max(index - 1, 0));
     setError("");
   }
 
@@ -92,7 +102,7 @@ export function QuizClient() {
       </header>
 
       <div className="quiz-stage">
-        <section className="quiz-panel">
+        <section className={`quiz-panel quiz-panel--${direction}`} key={current.id}>
           <div className="question-topline">
             <span>
               {currentIndex + 1}/{QUESTIONS.length}
@@ -128,7 +138,7 @@ export function QuizClient() {
             <Button
               className="quiz-action-button quiz-action-button--secondary"
               disabled={currentIndex === 0}
-              onClick={() => setCurrentIndex((index) => Math.max(index - 1, 0))}
+              onClick={goPrevious}
               size="lg"
               type="button"
               variant="outline"
