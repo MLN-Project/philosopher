@@ -956,7 +956,7 @@ img {
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 0.52fr) minmax(0, 0.48fr);
-  gap: clamp(2rem, 7vw, 8rem);
+  gap: clamp(2rem, 5.5vw, 6.5rem);
   align-items: center;
   width: 100%;
   min-height: clamp(36rem, 72vh, 52rem);
@@ -995,6 +995,7 @@ img {
   display: grid;
   justify-items: start;
   align-content: center;
+  container-type: inline-size;
 }
 
 .chapter-answer-side {
@@ -1032,9 +1033,10 @@ img {
 }
 
 .story-card h2 {
-  max-width: 9ch;
+  max-width: min(11ch, 100%);
   margin-top: clamp(1rem, 2.5vw, 2rem);
-  font-size: clamp(3.8rem, 8.6vw, 10rem);
+  font-size: clamp(3.8rem, 7.2vw, 8rem);
+  font-size: clamp(3.8rem, min(7.2vw, 16cqw), 8rem);
   line-height: 0.8;
   letter-spacing: -0.06em;
 }
@@ -1490,8 +1492,8 @@ img {
   grid-template-columns: minmax(0, 1fr);
   justify-items: center;
   align-items: center;
-  min-height: 100svh;
-  padding: 7rem clamp(1.25rem, 5vw, 6rem) clamp(4rem, 8vw, 7rem);
+  min-height: clamp(44rem, 118svh, 76rem);
+  padding: 7rem clamp(1.25rem, 5vw, 6rem) clamp(6rem, 11vw, 10rem);
   text-align: center;
   isolation: isolate;
 }
@@ -4376,6 +4378,13 @@ img {
   font-size: clamp(1.28rem, 2.7vw, 2.35rem);
   font-weight: 650;
   line-height: 0.95;
+}
+
+.result-page .result-percentage {
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  font-variant-numeric: lining-nums;
+  font-weight: 650;
+  letter-spacing: 0;
 }
 
 .dimension-section,
