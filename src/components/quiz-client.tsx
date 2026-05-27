@@ -5,18 +5,12 @@ import { useRouter } from "next/navigation";
 import { startTransition, useEffect, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
 import { ArrowLeft, Sparkles } from "lucide-react";
+import { LanguageToggle } from "@/components/language-toggle";
+import { useLanguage } from "@/components/language-provider";
 import { Button } from "@/components/ui/button";
-import { QUESTIONS } from "@/lib/quiz-data";
+import { getAppCopy } from "@/lib/app-copy";
+import { axisLabels, getLocalizedQuestions } from "@/lib/localized-quiz";
 import type { SubmittedAnswer } from "@/lib/types";
-
-const axisLabels = {
-  materialism: "Material life",
-  dialectics: "Contradiction",
-  individual_society: "Self and society",
-  authority_power: "Power",
-  ethics_action: "Action",
-  freedom_alienation: "Freedom"
-} as const;
 
 type QuizDirection = "idle" | "next" | "previous";
 
@@ -24,15 +18,18 @@ const AUTO_ADVANCE_DELAY_MS = 450;
 
 export function QuizClient() {
   const router = useRouter();
+  const { language } = useLanguage();
+  const copy = getAppCopy(language);
+  const questions = getLocalizedQuestions(language);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState<QuizDirection>("idle");
   const [error, setError] = useState("");
   const [isSubmitting, setSubmitting] = useState(false);
-  const current = QUESTIONS[currentIndex];
+  const current = questions[currentIndex];
   const answeredCount = Object.keys(answers).length;
-  const isComplete = answeredCount === QUESTIONS.length;
-  const progressPercent = ((currentIndex + 1) / QUESTIONS.length) * 100;
+  const isComplete = answeredCount === questions.length;
+  const progressPercent = ((currentIndex + 1) / questions.length) * 100;
   const currentIndexRef = useRef(currentIndex);
   const autoAdvanceTimeoutRef = useRef<number | null>(null);
 
@@ -64,7 +61,7 @@ export function QuizClient() {
       if (currentIndexRef.current !== questionIndex) return;
 
       setDirection("next");
-      setCurrentIndex(Math.min(questionIndex + 1, QUESTIONS.length - 1));
+      setCurrentIndex(Math.min(questionIndex + 1, questions.length - 1));
       setError("");
     }, AUTO_ADVANCE_DELAY_MS);
   }
@@ -77,7 +74,7 @@ export function QuizClient() {
   function chooseAnswer(answerId: string) {
     selectAnswer(answerId);
 
-    if (currentIndex < QUESTIONS.length - 1) {
+    if (currentIndex < questions.length - 1) {
       scheduleAutoAdvance(currentIndex);
     }
   }
@@ -119,12 +116,12 @@ export function QuizClient() {
     clearScheduledAdvance();
 
     if (!answers[current.id]) {
-      setError("Choose one answer before moving forward.");
+      setError(copy.quiz.chooseOne);
       return;
     }
 
     if (!isComplete) {
-      setError(`Answer all ${QUESTIONS.length} questions before opening the result.`);
+      setError(copy.quiz.answerAll.replace("{count}", String(questions.length)));
       return;
     }
 
@@ -132,7 +129,7 @@ export function QuizClient() {
     setError("");
 
     const payload: { answers: SubmittedAnswer[] } = {
-      answers: QUESTIONS.map((question) => ({
+      answers: questions.map((question) => ({
         questionId: question.id,
         answerId: answers[question.id]
       }))
@@ -153,7 +150,7 @@ export function QuizClient() {
       window.localStorage.setItem(`philosopher-result:${result.sessionId}`, JSON.stringify(result));
       startTransition(() => router.push(`/result/${result.sessionId}`));
     } catch {
-      setError("The archive failed to score your result. Check the server and try again.");
+      setError(copy.quiz.scoreError);
       setSubmitting(false);
     }
   }
@@ -163,8 +160,9 @@ export function QuizClient() {
       <div className="quiz-map" aria-hidden="true" />
       <header className="quiz-header">
         <Link className="text-link quiz-return-link" href="/">
-          Return to landing
+          {copy.quiz.return}
         </Link>
+        <LanguageToggle />
         <div className="quiz-top-progress" aria-hidden="true">
           <span style={{ width: `${progressPercent}%` }} />
         </div>
@@ -175,7 +173,7 @@ export function QuizClient() {
           <div className="question-topline">
             <div className="question-progress">
               <Button
-                aria-label="Previous question"
+                aria-label={copy.quiz.previousQuestion}
                 className="question-previous-button"
                 disabled={currentIndex === 0}
                 onClick={goPrevious}
@@ -186,10 +184,10 @@ export function QuizClient() {
                 <ArrowLeft aria-hidden="true" />
               </Button>
               <span>
-                {currentIndex + 1}/{QUESTIONS.length}
+                {currentIndex + 1}/{questions.length}
               </span>
             </div>
-            <span>{axisLabels[current.axis]}</span>
+            <span>{axisLabels[language][current.axis]}</span>
           </div>
           <h1>{current.prompt}</h1>
           <p className="question-context">{current.context}</p>
@@ -218,11 +216,11 @@ export function QuizClient() {
             })}
           </div>
 
-          <footer className={currentIndex === QUESTIONS.length - 1 ? "quiz-controls" : "quiz-controls quiz-controls--auto"}>
+          <footer className={currentIndex === questions.length - 1 ? "quiz-controls" : "quiz-controls quiz-controls--auto"}>
             <div aria-live="polite" className="quiz-message-slot">
               {error ? <p className="form-error">{error}</p> : null}
             </div>
-            {currentIndex === QUESTIONS.length - 1 ? (
+            {currentIndex === questions.length - 1 ? (
               <Button
                 className="quiz-action-button quiz-action-button--primary"
                 disabled={isSubmitting}
@@ -231,7 +229,7 @@ export function QuizClient() {
                 type="button"
               >
                 <Sparkles aria-hidden="true" data-icon="inline-start" />
-                {isSubmitting ? "Reading the archive..." : "Reveal my philosopher"}
+                {isSubmitting ? copy.quiz.reading : copy.quiz.reveal}
               </Button>
             ) : null}
           </footer>

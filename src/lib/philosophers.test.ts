@@ -24,4 +24,12 @@ describe("philosopher source links", () => {
       }
     }
   });
+
+  it("opens embedded portrait pages from the credits ledger instead of Wikimedia image endpoints", () => {
+    for (const philosopher of PHILOSOPHERS) {
+      expect(philosopher.sourcePageUrl).toMatch(/^https:\/\/en\.wikipedia\.org\/wiki\//);
+      expect(philosopher.sourcePageUrl).not.toContain("Special:FilePath");
+      expect(philosopher.sourcePageUrl).not.toMatch(/\.(?:png|jpe?g|webp|gif|svg)(?:$|[?#])/i);
+    }
+  });
 });

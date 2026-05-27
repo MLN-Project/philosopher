@@ -8,52 +8,12 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useEffect, useRef } from "react";
 import type { MouseEvent, PointerEvent } from "react";
+import { LanguageToggle } from "@/components/language-toggle";
+import { useLanguage } from "@/components/language-provider";
+import { getAppCopy, getLandingChapters } from "@/lib/app-copy";
+import { getLocalizedPhilosopherById } from "@/lib/localized-philosophers";
 import { scrollToSmoothTarget } from "@/lib/smooth-scroll";
-import { PHILOSOPHER_BY_ID } from "@/lib/philosophers";
 import type { PhilosopherId } from "@/lib/types";
-
-const chapters = [
-  {
-    title: "What is philosophy?",
-    answer:
-      "A disciplined way of asking what is real, what can be known, and what kind of life deserves your loyalty.",
-    note: "The quiz begins with the habit behind every answer: how you decide what deserves to be called true.",
-    signal: "Truth, value, method",
-    mark: "I"
-  },
-  {
-    title: "Matter and consciousness",
-    answer:
-      "The old divide between thought and world: whether ideas command history, or material life gives ideas their shape.",
-    note: "This is where worldview becomes a map: spirit, nature, labor, memory, and the conditions that shape thought.",
-    signal: "Worldview, labor, perception",
-    mark: "II"
-  },
-  {
-    title: "Contradiction and development",
-    answer:
-      "A world in motion cannot be understood by still categories. Tension is often the pressure by which things become otherwise.",
-    note: "Here the test listens for whether you see conflict as error, tragedy, discipline, or the engine of change.",
-    signal: "Movement, negation, change",
-    mark: "III"
-  },
-  {
-    title: "Society, class, and the state",
-    answer:
-      "No self floats alone. Work, power, institutions, and shared history write themselves into private life.",
-    note: "Your answers start to reveal how you read authority: as order, alienation, duty, violence, or collective form.",
-    signal: "Power, history, collective life",
-    mark: "IV"
-  },
-  {
-    title: "Human beings and liberation",
-    answer:
-      "The final question is personal: what kind of freedom do your answers keep trying to defend?",
-    note: "By the end, the result is less a label than a portrait of the freedom you keep returning to.",
-    signal: "Freedom, responsibility, becoming",
-    mark: "V"
-  }
-];
 
 const timelinePhilosophers: PhilosopherId[] = [
   "plato",
@@ -72,6 +32,10 @@ const timelinePhilosophers: PhilosopherId[] = [
 
 export function LandingExperience() {
   const router = useRouter();
+  const { language } = useLanguage();
+  const copy = getAppCopy(language);
+  const chapters = getLandingChapters(language);
+  const philosopherById = getLocalizedPhilosopherById(language);
   const rootRef = useRef<HTMLElement>(null);
   const pathSectionRef = useRef<HTMLElement>(null);
   const transitionTimeoutRef = useRef<number | null>(null);
@@ -311,24 +275,22 @@ export function LandingExperience() {
             <div className="video-vignette" />
             <div className="video-paper-grain" />
           </div>
-          <nav className="top-nav" aria-label="Main navigation">
-            <span className="brand-mark">Philosopher Atlas</span>
+          <nav className="top-nav" aria-label={copy.landing.navAria}>
+            <span className="brand-mark">{copy.nav.brand}</span>
             <div>
-              <Link href="/philosophers">Philosophers</Link>
-              <Link href="/quiz">Quiz</Link>
-              <Link href="/credits">Credits</Link>
+              <Link href="/philosophers">{copy.nav.philosophers}</Link>
+              <Link href="/quiz">{copy.nav.quiz}</Link>
+              <Link href="/credits">{copy.nav.credits}</Link>
+              <LanguageToggle />
             </div>
           </nav>
           <div className="hero-copy">
-            <p className="scribe-line">A cinematic personality test through ancient questions and material history.</p>
-            <h1>Which philosopher is hidden in your way of seeing the world?</h1>
-            <p className="hero-text">
-              Walk through a parchment map of ideas, contradiction, society, power, and freedom. At the end,
-              your answers are scored against twelve thinkers from Plato to Marx, Lenin, Beauvoir, Laozi, and Sartre.
-            </p>
+            <p className="scribe-line">{copy.landing.heroScribe}</p>
+            <h1>{copy.landing.heroTitle}</h1>
+            <p className="hero-text">{copy.landing.heroText}</p>
           </div>
           <a className="hero-scroll-cue" href="#path" onClick={handleRevealPathClick}>
-            <span>Reveal the path</span>
+            <span>{copy.landing.revealPath}</span>
             <ChevronDown aria-hidden="true" />
           </a>
         </div>
@@ -338,27 +300,24 @@ export function LandingExperience() {
         id="path"
         ref={pathSectionRef}
         className="philosopher-path-section"
-        aria-label="Connected philosopher timeline"
+        aria-label={copy.landing.pathAria}
         onPointerLeave={handlePathPointerLeave}
         onPointerMove={handlePathPointerMove}
       >
         <div className="path-grid-texture" aria-hidden="true" />
         <div className="path-intro">
-          <span>Follow the line</span>
-          <h2>A path of thinkers across the map</h2>
-          <p>
-            As you scroll, the route moves from ancient ideals and virtue, through dialectics and materialism,
-            toward freedom, critique, and existence.
-          </p>
+          <span>{copy.landing.pathKicker}</span>
+          <h2>{copy.landing.pathTitle}</h2>
+          <p>{copy.landing.pathText}</p>
         </div>
         <div className="philosopher-path">
           <div className="route-thread" aria-hidden="true" />
           {timelinePhilosophers.map((id) => {
-            const philosopher = PHILOSOPHER_BY_ID[id];
+            const philosopher = philosopherById[id];
             return (
               <article className="philosopher-node" key={id}>
                 <Link
-                  aria-label={`Explore ${philosopher.name}`}
+                  aria-label={`${copy.landing.explore} ${philosopher.name}`}
                   className="node-portrait philosopher-portrait-link"
                   href={`/philosophers/${id}`}
                   onClick={handlePhilosopherPageClick}
@@ -383,12 +342,14 @@ export function LandingExperience() {
         </div>
       </section>
 
-      <section id="story" className="story-section" aria-label="Philosophy story chapters">
+      <section id="story" className="story-section" aria-label={copy.landing.storyAria}>
         <div className="story-track">
           {chapters.map((chapter, index) => (
             <article className="story-card" key={chapter.title}>
               <div className="chapter-title-side">
-                <span className="chapter-rule">Chapter {String(index + 1).padStart(2, "0")}</span>
+                <span className="chapter-rule">
+                  {copy.landing.chapterLabel} {String(index + 1).padStart(2, "0")}
+                </span>
                 <span className="chapter-mark">{chapter.mark}</span>
                 <h2>{chapter.title}</h2>
               </div>
@@ -406,29 +367,26 @@ export function LandingExperience() {
         <div className="final-seal">
           <div className="final-constellation" aria-hidden="true" />
           <div className="final-copy">
-            <span>The atlas resolves</span>
-            <h2>Find the thinker your answers have been tracing.</h2>
-            <p>
-              Open a scored result with your closest philosopher, neighboring influences, selected quotes,
-              and a short reflection on the pattern behind your choices.
-            </p>
+            <span>{copy.landing.finalKicker}</span>
+            <h2>{copy.landing.finalTitle}</h2>
+            <p>{copy.landing.finalText}</p>
             <Link className="primary-cta large final-cta" href="/quiz">
-              Take the Test
+              {copy.landing.takeTest}
               <ArrowRight aria-hidden="true" />
             </Link>
           </div>
-          <div className="final-route" aria-label="Result summary">
+          <div className="final-route" aria-label={copy.landing.resultSummaryAria}>
             <div>
               <strong>30</strong>
-              <span>questions</span>
+              <span>{copy.landing.questions}</span>
             </div>
             <div>
               <strong>6</strong>
-              <span>hidden axes</span>
+              <span>{copy.landing.hiddenAxes}</span>
             </div>
             <div>
               <strong>12</strong>
-              <span>thinkers</span>
+              <span>{copy.landing.thinkers}</span>
             </div>
           </div>
         </div>

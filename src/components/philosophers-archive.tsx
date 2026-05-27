@@ -7,12 +7,20 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight, BookOpen, Quote } from "lucide-react";
 import { useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
-import { archiveDetails, archiveOrder, archiveThreads } from "@/lib/philosopher-archive";
-import { PHILOSOPHER_BY_ID } from "@/lib/philosophers";
-
-const archivePhilosophers = archiveOrder.map((id) => PHILOSOPHER_BY_ID[id]);
+import { LanguageToggle } from "@/components/language-toggle";
+import { useLanguage } from "@/components/language-provider";
+import { getAppCopy } from "@/lib/app-copy";
+import { getLocalizedArchiveDetails, getLocalizedArchiveThreads } from "@/lib/localized-archive";
+import { getLocalizedPhilosopherById } from "@/lib/localized-philosophers";
+import { archiveOrder } from "@/lib/philosopher-archive";
 
 export function PhilosophersArchive() {
+  const { language } = useLanguage();
+  const copy = getAppCopy(language);
+  const philosopherById = getLocalizedPhilosopherById(language);
+  const archiveDetails = getLocalizedArchiveDetails(language);
+  const archiveThreads = getLocalizedArchiveThreads(language);
+  const archivePhilosophers = archiveOrder.map((id) => philosopherById[id]);
   const rootRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -170,34 +178,32 @@ export function PhilosophersArchive() {
   return (
     <main ref={rootRef} className="philosophers-archive">
       <div className="archive-paper-grain" aria-hidden="true" />
-      <nav className="archive-nav" aria-label="Philosopher archive navigation">
+      <nav className="archive-nav" aria-label={copy.archive.navAria}>
         <Link className="brand-mark" href="/">
-          Philosopher Atlas
+          {copy.nav.brand}
         </Link>
         <div>
-          <Link href="/philosophers">Philosophers</Link>
-          <Link href="/quiz">Quiz</Link>
-          <Link href="/credits">Credits</Link>
+          <Link href="/philosophers">{copy.nav.philosophers}</Link>
+          <Link href="/quiz">{copy.nav.quiz}</Link>
+          <Link href="/credits">{copy.nav.credits}</Link>
+          <LanguageToggle />
         </div>
       </nav>
 
-      <section className="philosophers-hero" aria-label="Philosopher archive introduction">
+      <section className="philosophers-hero" aria-label={copy.archive.heroAria}>
         <div className="archive-hero-copy">
-          <span>Philosopher archive</span>
-          <h1>The thinkers inside the parchment.</h1>
-          <p>
-            A closer room for the twelve figures on the map: their histories, core ideas, quotes,
-            recommended works, and the threads that connect them.
-          </p>
+          <span>{copy.archive.heroKicker}</span>
+          <h1>{copy.archive.heroTitle}</h1>
+          <p>{copy.archive.heroText}</p>
         </div>
 
       </section>
 
-      <section id="roster" className="archive-roster" aria-label="Philosopher roster">
+      <section id="roster" className="archive-roster" aria-label={copy.archive.rosterAria}>
         <div className="archive-section-heading">
-          <span>Roster</span>
-          <h2>Select a thinker</h2>
-          <p>Each portrait opens a dedicated page, from ancient virtue to dialectics and existential freedom.</p>
+          <span>{copy.archive.roster}</span>
+          <h2>{copy.archive.selectThinker}</h2>
+          <p>{copy.archive.rosterText}</p>
         </div>
         <div className="archive-portrait-grid">
           {archivePhilosophers.map((philosopher) => (
@@ -221,7 +227,7 @@ export function PhilosophersArchive() {
         </div>
       </section>
 
-      <section className="thinker-ledger" aria-label="Philosopher histories and quotes">
+      <section className="thinker-ledger" aria-label={copy.archive.ledgerAria}>
         {archivePhilosophers.map((philosopher, index) => {
           const detail = archiveDetails[philosopher.id];
 
@@ -252,20 +258,20 @@ export function PhilosophersArchive() {
                   <p>{detail.history}</p>
                   <p>{detail.legacy}</p>
                 </div>
-                <div className="thinker-ideas" aria-label={`${philosopher.name} core ideas`}>
+                <div className="thinker-ideas" aria-label={`${philosopher.name} ${copy.archive.coreIdeas}`}>
                   {detail.ideas.map((idea) => (
                     <span key={idea}>{idea}</span>
                   ))}
                 </div>
               </div>
-              <aside className="thinker-aside" aria-label={`${philosopher.name} quote and reading`}>
+              <aside className="thinker-aside" aria-label={`${philosopher.name} ${copy.archive.quoteReading}`}>
                 <Quote aria-hidden="true" />
                 <blockquote>{philosopher.quote}</blockquote>
                 <cite>{philosopher.quoteNote}</cite>
                 <div className="thinker-reading">
                   <BookOpen aria-hidden="true" />
                   <div>
-                    <span>Start with</span>
+                    <span>{copy.archive.startWith}</span>
                     <strong>{detail.primaryWork}</strong>
                   </div>
                 </div>
@@ -276,11 +282,11 @@ export function PhilosophersArchive() {
         })}
       </section>
 
-      <section className="archive-thread-section" aria-label="Philosophical threads">
+      <section className="archive-thread-section" aria-label={copy.archive.threadsAria}>
         <div className="archive-section-heading">
-          <span>Threads</span>
-          <h2>How the map connects</h2>
-          <p>The page is not a museum shelf. It is a route through recurring problems.</p>
+          <span>{copy.archive.threads}</span>
+          <h2>{copy.archive.mapConnects}</h2>
+          <p>{copy.archive.mapConnectsText}</p>
         </div>
         <div className="archive-thread-list">
           {archiveThreads.map((thread) => (
@@ -290,7 +296,7 @@ export function PhilosophersArchive() {
               <div>
                 {thread.ids.map((id) => (
                   <Link href={`/philosophers/${id}`} key={id}>
-                    {PHILOSOPHER_BY_ID[id].name}
+                    {philosopherById[id].name}
                   </Link>
                 ))}
               </div>
@@ -299,30 +305,30 @@ export function PhilosophersArchive() {
         </div>
       </section>
 
-      <section className="final-scroll archive-final-scroll" aria-label="Return to the quiz">
+      <section className="final-scroll archive-final-scroll" aria-label={copy.archive.finalAria}>
         <div className="final-seal">
           <div className="final-constellation" aria-hidden="true" />
           <div className="final-copy">
-            <span>Return to the test</span>
-            <h2>Now let the archive read you back.</h2>
-            <p>Take the quiz and compare your result with the thinkers you just traced.</p>
+            <span>{copy.archive.finalKicker}</span>
+            <h2>{copy.archive.finalTitle}</h2>
+            <p>{copy.archive.finalText}</p>
             <Link className="primary-cta large final-cta" href="/quiz">
-              Take the Test
+              {copy.landing.takeTest}
               <ArrowRight aria-hidden="true" />
             </Link>
           </div>
-          <div className="final-route" aria-label="Archive summary">
+          <div className="final-route" aria-label={copy.archive.summaryAria}>
             <div>
               <strong>12</strong>
-              <span>thinkers</span>
+              <span>{copy.landing.thinkers}</span>
             </div>
             <div>
               <strong>3</strong>
-              <span>threads</span>
+              <span>{copy.archive.threads}</span>
             </div>
             <div>
               <strong>30</strong>
-              <span>questions</span>
+              <span>{copy.landing.questions}</span>
             </div>
           </div>
         </div>

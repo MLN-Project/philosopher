@@ -4,19 +4,20 @@ import { getStaticCommentary } from "@/lib/static-commentary";
 import { getQuizSession, persistCommentary } from "@/lib/storage";
 
 const analyzeSchema = z.object({
+  language: z.enum(["en", "vi"]).optional(),
   sessionId: z.string().uuid()
 });
 
 export async function POST(request: NextRequest) {
   try {
-    const { sessionId } = analyzeSchema.parse(await request.json());
+    const { language = "en", sessionId } = analyzeSchema.parse(await request.json());
     const session = await getQuizSession(sessionId);
 
     if (!session) {
       return NextResponse.json({ error: "Result not found." }, { status: 404 });
     }
 
-    const commentary = getStaticCommentary(session);
+    const commentary = getStaticCommentary(session, language);
     await persistCommentary(sessionId, commentary);
 
     return NextResponse.json(commentary);
