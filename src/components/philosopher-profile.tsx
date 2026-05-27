@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowLeft, ArrowRight, BookOpen, Quote } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, ExternalLink, FileText, Quote } from "lucide-react";
 import { useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
 import { archiveDetails, archiveOrder, archiveThreads } from "@/lib/philosopher-archive";
@@ -88,7 +88,7 @@ export function PhilosopherProfile({ philosopherId }: PhilosopherProfileProps) {
       style={{ "--archive-color": philosopher.color } as CSSProperties}
     >
       <div className="archive-paper-grain" aria-hidden="true" />
-      <nav className="profile-nav" aria-label={`${philosopher.name} navigation`}>
+      <nav className="top-nav profile-nav" aria-label={`${philosopher.name} navigation`}>
         <Link className="brand-mark" href="/">
           Philosopher Atlas
         </Link>
@@ -104,7 +104,7 @@ export function PhilosopherProfile({ philosopherId }: PhilosopherProfileProps) {
           <span>{detail.life} / {detail.place}</span>
           <h1>{philosopher.name}</h1>
           <p className="profile-era">{philosopher.era}</p>
-          <p>{philosopher.description}</p>
+          <p>{detail.history}</p>
           <div className="profile-hero-actions">
             <Link className="primary-cta" href="#history">
               Read history
@@ -129,8 +129,10 @@ export function PhilosopherProfile({ philosopherId }: PhilosopherProfileProps) {
 
       <section className="profile-quote-band profile-reveal" aria-label={`${philosopher.name} quote`}>
         <Quote aria-hidden="true" />
-        <blockquote>{philosopher.quote}</blockquote>
-        <cite>{philosopher.quoteNote}</cite>
+        <blockquote>{detail.quotes[0].text}</blockquote>
+        <cite>
+          {detail.quotes[0].work} / {detail.quotes[0].note}
+        </cite>
       </section>
 
       <section id="history" className="profile-history-section profile-reveal" aria-label={`${philosopher.name} history`}>
@@ -139,8 +141,28 @@ export function PhilosopherProfile({ philosopherId }: PhilosopherProfileProps) {
           <h2>The pressure behind the thought</h2>
         </div>
         <div className="profile-history-copy">
-          <p>{detail.history}</p>
-          <p>{detail.legacy}</p>
+          {detail.biography.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+        </div>
+      </section>
+
+      <section className="profile-timeline-section profile-reveal" aria-label={`${philosopher.name} timeline`}>
+        <div className="profile-section-heading">
+          <span>Timeline</span>
+          <h2>A life in pressure points</h2>
+        </div>
+        <div className="profile-timeline">
+          {detail.timeline.map((event, eventIndex) => (
+            <article className="profile-timeline-item" key={`${event.year}-${event.title}`}>
+              <span>{String(eventIndex + 1).padStart(2, "0")}</span>
+              <time>{event.year}</time>
+              <div>
+                <h3>{event.title}</h3>
+                <p>{event.copy}</p>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
@@ -164,6 +186,23 @@ export function PhilosopherProfile({ philosopherId }: PhilosopherProfileProps) {
         </div>
       </section>
 
+      <section className="profile-quote-section profile-reveal" aria-label={`${philosopher.name} additional quotes`}>
+        <div className="profile-section-heading">
+          <span>Quotes</span>
+          <h2>Three lines to keep open</h2>
+        </div>
+        <div className="profile-quote-grid">
+          {detail.quotes.map((quote, quoteIndex) => (
+            <article className="profile-quote-card" key={`${quote.work}-${quote.text}`}>
+              <span>{String(quoteIndex + 1).padStart(2, "0")}</span>
+              <blockquote>{quote.text}</blockquote>
+              <cite>{quote.work}</cite>
+              <p>{quote.note}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className="profile-thread-section profile-reveal" aria-label={`${philosopher.name} philosophical threads`}>
         <div className="profile-section-heading">
           <span>Threads</span>
@@ -182,6 +221,26 @@ export function PhilosopherProfile({ philosopherId }: PhilosopherProfileProps) {
                 ))}
               </div>
             </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="profile-source-section profile-reveal" aria-label={`${philosopher.name} research sources`}>
+        <div className="profile-section-heading">
+          <span>Sources</span>
+          <h2>Where this page was checked</h2>
+        </div>
+        <div className="profile-source-list">
+          {detail.sources.map((source) => (
+            <a href={source.url} key={source.url} rel="noreferrer" target="_blank">
+              <FileText aria-hidden="true" />
+              <div>
+                <span>{source.type}</span>
+                <strong>{source.label}</strong>
+                <p>{source.note}</p>
+              </div>
+              <ExternalLink aria-hidden="true" />
+            </a>
           ))}
         </div>
       </section>

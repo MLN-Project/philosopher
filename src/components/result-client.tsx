@@ -378,7 +378,7 @@ export function ResultClient({ sessionId }: { sessionId: string }) {
           <div className="result-meta-grid" aria-label="Result details">
             <div>
               <span>Top cluster</span>
-              <strong>{result.topMatches[0].percentage}%</strong>
+              <strong className="result-percentage">{result.topMatches[0].percentage}%</strong>
             </div>
             <div>
               <span>Recorded</span>
@@ -420,7 +420,7 @@ export function ResultClient({ sessionId }: { sessionId: string }) {
                   <strong>{dimension.label}</strong>
                   <span>{dimension.description}</span>
                 </div>
-                <em>{dimension.percentage}%</em>
+                <em className="result-percentage">{dimension.percentage}%</em>
               </div>
             ))}
           </div>
@@ -453,7 +453,7 @@ export function ResultClient({ sessionId }: { sessionId: string }) {
                   <span className="match-meter">
                     <span className="match-meter-fill" style={{ width: `${match.percentage}%` }} />
                   </span>
-                  <strong className="match-percent">{match.percentage}%</strong>
+                  <strong className="match-percent result-percentage">{match.percentage}%</strong>
                 </div>
               </article>
             );

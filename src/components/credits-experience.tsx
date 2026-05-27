@@ -4,13 +4,22 @@ import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import type { CSSProperties } from "react";
+import type { CSSProperties, MouseEvent } from "react";
 import { useEffect, useRef } from "react";
-import { ArrowLeft, ExternalLink, FileText, ScrollText } from "lucide-react";
+import { ArrowLeft, ChevronDown, ExternalLink, FileText } from "lucide-react";
+import { scrollToSmoothTarget } from "@/lib/smooth-scroll";
 import { PHILOSOPHERS } from "@/lib/philosophers";
+import { archiveDetails, archiveOrder } from "@/lib/philosopher-archive";
 
 const featuredPhilosophers = PHILOSOPHERS.filter((philosopher) =>
   ["marx", "lenin", "beauvoir"].includes(philosopher.id)
+);
+
+const researchSources = archiveOrder.flatMap((id) =>
+  archiveDetails[id].sources.map((source) => ({
+    ...source,
+    philosopherId: id
+  }))
 );
 
 const creditFacts = [
@@ -20,14 +29,14 @@ const creditFacts = [
     copy: "Every thinker keeps a visible source trail."
   },
   {
+    label: "Research sources",
+    value: researchSources.length.toString().padStart(2, "0"),
+    copy: "Profile histories and quote notes point back to checked references."
+  },
+  {
     label: "Generated asset scope",
     value: "Map",
     copy: "Prompts stay limited to parchment, scroll, atlas, and abstract interface materials."
-  },
-  {
-    label: "Release check",
-    value: "Required",
-    copy: "Final selected files still need license and attribution review before public release."
   }
 ];
 
@@ -43,11 +52,29 @@ const assetNotes = [
   {
     title: "Generated materials",
     copy: "Generated visual work stays limited to atmosphere and interface texture: parchment, maps, scrolls, routes, and abstract UI elements."
+  },
+  {
+    title: "Research links",
+    copy: "Each philosopher profile now lists the research and primary-text links used for the expanded history, quote labels, and timeline."
   }
 ];
 
 export function CreditsExperience() {
   const rootRef = useRef<HTMLElement>(null);
+  const sourceLedgerRef = useRef<HTMLElement>(null);
+
+  const handleViewSourceClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    const sourceLedger = sourceLedgerRef.current;
+    if (!sourceLedger) return;
+
+    const shouldReduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!shouldReduceMotion && scrollToSmoothTarget(sourceLedger)) {
+      return;
+    }
+
+    sourceLedger.scrollIntoView({ behavior: shouldReduceMotion ? "auto" : "smooth", block: "start" });
+  };
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -70,13 +97,18 @@ export function CreditsExperience() {
           "-=0.14"
         )
         .from(".credits-hero-copy p", { autoAlpha: 0, y: 22, duration: 0.68 }, "-=0.58")
-        .from(".credits-actions > *", { autoAlpha: 0, y: 18, duration: 0.5, stagger: 0.08 }, "-=0.34")
         .from(
           ".credits-featured-portrait",
           { autoAlpha: 0, y: 64, rotate: -3, scale: 0.92, duration: 0.86, stagger: 0.12 },
           "-=0.78"
         )
-        .from(".credits-source-ribbon span", { autoAlpha: 0, x: 22, duration: 0.42, stagger: 0.08 }, "-=0.4");
+        .from(".credits-source-ribbon span", { autoAlpha: 0, x: 22, duration: 0.42, stagger: 0.08 }, "-=0.4")
+        .fromTo(
+          ".credits-scroll-cue",
+          { autoAlpha: 0, xPercent: -50, y: 18 },
+          { autoAlpha: 1, xPercent: -50, y: 0, duration: 0.58 },
+          "-=0.16"
+        );
 
       gsap.to(".credits-map-layer", {
         yPercent: 8,
@@ -180,16 +212,6 @@ export function CreditsExperience() {
             A transparent source room for the portraits, generated atlas textures, and release notes behind
             Philosopher Atlas.
           </p>
-          <div className="credits-actions">
-            <a className="primary-cta" href="#source-ledger">
-              <ScrollText aria-hidden="true" />
-              View Source Ledger
-            </a>
-            <Link className="secondary-cta credits-secondary-cta" href="/">
-              <ArrowLeft aria-hidden="true" />
-              Back to the Map
-            </Link>
-          </div>
         </div>
 
         <div className="credits-hero-art" aria-hidden="true">
@@ -206,12 +228,17 @@ export function CreditsExperience() {
               />
             ))}
           </div>
-          <div className="credits-source-ribbon">
-            <span>Wikimedia Commons</span>
-            <span>Generated atlas textures</span>
-            <span>Local release checks</span>
-          </div>
+        <div className="credits-source-ribbon">
+          <span>Wikimedia Commons</span>
+          <span>Stanford Encyclopedia</span>
+          <span>Primary text links</span>
+          <span>Generated atlas textures</span>
         </div>
+        </div>
+        <a className="credits-scroll-cue" href="#source-ledger" onClick={handleViewSourceClick}>
+          <span>View the source</span>
+          <ChevronDown aria-hidden="true" />
+        </a>
       </section>
 
       <section className="credits-summary" aria-label="Asset summary">
@@ -242,7 +269,12 @@ export function CreditsExperience() {
         </div>
       </section>
 
-      <section id="source-ledger" className="credits-ledger-section" aria-label="Philosopher portrait source ledger">
+      <section
+        id="source-ledger"
+        ref={sourceLedgerRef}
+        className="credits-ledger-section"
+        aria-label="Philosopher portrait source ledger"
+      >
         <div className="credits-ledger-heading">
           <span className="credits-kicker">Portrait sources</span>
           <h2>Every thinker keeps a visible trail.</h2>
@@ -276,6 +308,50 @@ export function CreditsExperience() {
                 <a className="credits-source-link" href={philosopher.sourceUrl} rel="noreferrer" target="_blank">
                   <FileText aria-hidden="true" />
                   <span>Source page</span>
+                  <ExternalLink aria-hidden="true" />
+                </a>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section
+        className="credits-ledger-section credits-research-ledger-section"
+        aria-label="Philosopher profile research source ledger"
+      >
+        <div className="credits-ledger-heading">
+          <span className="credits-kicker">Profile research</span>
+          <h2>The histories cite their rooms.</h2>
+          <p>
+            These references were used for the expanded philosopher pages: biography, timeline, major works,
+            and short quote context.
+          </p>
+        </div>
+
+        <div className="credits-ledger">
+          {researchSources.map((source, index) => {
+            const philosopher = PHILOSOPHERS.find((item) => item.id === source.philosopherId);
+
+            return (
+              <article
+                className="credits-source-row credits-source-row--research"
+                key={`${source.philosopherId}-${source.url}`}
+                style={{ "--credit-color": philosopher?.color ?? "#d7a65f" } as CSSProperties}
+              >
+                <span className="credits-source-index">{String(index + 1).padStart(2, "0")}</span>
+                <div className="credits-source-type" aria-hidden="true">
+                  <FileText />
+                </div>
+                <div className="credits-source-copy">
+                  <h3>{source.label}</h3>
+                  <p>
+                    {philosopher?.name ?? "Research"} / {source.type} / {source.note}
+                  </p>
+                </div>
+                <a className="credits-source-link" href={source.url} rel="noreferrer" target="_blank">
+                  <FileText aria-hidden="true" />
+                  <span>Open source</span>
                   <ExternalLink aria-hidden="true" />
                 </a>
               </article>
