@@ -5,10 +5,10 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Lenis from "lenis";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useEffect, useRef } from "react";
 import type { MouseEvent, PointerEvent } from "react";
+import { scrollToSmoothTarget } from "@/lib/smooth-scroll";
 import { PHILOSOPHER_BY_ID } from "@/lib/philosophers";
 import type { PhilosopherId } from "@/lib/types";
 
@@ -74,7 +74,6 @@ export function LandingExperience() {
   const router = useRouter();
   const rootRef = useRef<HTMLElement>(null);
   const pathSectionRef = useRef<HTMLElement>(null);
-  const lenisRef = useRef<Lenis | null>(null);
   const transitionTimeoutRef = useRef<number | null>(null);
 
   const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -98,11 +97,7 @@ export function LandingExperience() {
 
     const shouldReduceMotion = prefersReducedMotion();
 
-    if (!shouldReduceMotion && lenisRef.current) {
-      lenisRef.current.scrollTo(pathSection, {
-        duration: 1.65,
-        easing: (t: number) => 1 - Math.pow(1 - t, 4)
-      });
+    if (!shouldReduceMotion && scrollToSmoothTarget(pathSection)) {
       return;
     }
 
@@ -141,16 +136,6 @@ export function LandingExperience() {
     if (prefersReducedMotion()) return;
 
     gsap.registerPlugin(ScrollTrigger);
-    const lenis = new Lenis({ lerp: 0.08, wheelMultiplier: 0.9 });
-    lenisRef.current = lenis;
-    let frame = 0;
-
-    const raf = (time: number) => {
-      lenis.raf(time);
-      frame = requestAnimationFrame(raf);
-    };
-
-    frame = requestAnimationFrame(raf);
 
     const context = gsap.context(() => {
       gsap
@@ -297,9 +282,6 @@ export function LandingExperience() {
 
     return () => {
       context.revert();
-      cancelAnimationFrame(frame);
-      lenis.destroy();
-      lenisRef.current = null;
     };
   }, []);
 
