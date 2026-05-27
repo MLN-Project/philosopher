@@ -32,8 +32,8 @@ export function PhilosophersArchive() {
       heroReveal
         .fromTo(
           ".archive-hero-copy > span",
-          { autoAlpha: 0, y: 18 },
-          { autoAlpha: 1, y: 0, duration: 0.82 }
+          { autoAlpha: 0, clipPath: "inset(0 100% 0 0)", filter: "blur(4px)", x: -24 },
+          { autoAlpha: 1, clipPath: "inset(0 0% 0 0)", filter: "blur(0px)", x: 0, duration: 0.95 }
         )
         .fromTo(
           ".archive-hero-copy h1",
