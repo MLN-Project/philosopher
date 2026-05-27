@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { LanguageProvider } from "@/components/language-provider";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import "./globals.css";
 
@@ -14,10 +15,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
-        <SmoothScroll />
-        {children}
+        <LanguageProvider>
+          <SmoothScroll />
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

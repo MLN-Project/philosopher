@@ -6,8 +6,12 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-import { PHILOSOPHER_BY_ID } from "@/lib/philosophers";
+import { LanguageToggle } from "@/components/language-toggle";
+import { useLanguage } from "@/components/language-provider";
+import { formatTemplate, getAppCopy } from "@/lib/app-copy";
+import { getLocalizedPhilosopherById } from "@/lib/localized-philosophers";
 import { getStaticCommentary } from "@/lib/static-commentary";
+import type { Language } from "@/lib/i18n";
 import type { AiCommentary, AxisId, QuizResult } from "@/lib/types";
 
 type StoredResult = QuizResult & {
@@ -24,55 +28,96 @@ type DimensionProfile = {
   percentage: number;
 };
 
-const DIMENSIONS: Omit<DimensionProfile, "score" | "percentage">[] = [
-  {
-    id: "materialism",
-    label: "Material life",
-    shortLabel: "Conditions",
-    description: "How strongly you read ideas through labor, bodies, property, and lived conditions."
-  },
-  {
-    id: "dialectics",
-    label: "Contradiction",
-    shortLabel: "Change",
-    description: "How naturally you see tension, negation, and development inside events."
-  },
-  {
-    id: "individual_society",
-    label: "Self and society",
-    shortLabel: "Relation",
-    description: "How much you treat identity as something formed through shared life."
-  },
-  {
-    id: "authority_power",
-    label: "Power",
-    shortLabel: "Authority",
-    description: "How alert you are to institutions, command, discipline, and domination."
-  },
-  {
-    id: "ethics_action",
-    label: "Action",
-    shortLabel: "Practice",
-    description: "How much you turn belief into conduct, habit, responsibility, or strategy."
-  },
-  {
-    id: "freedom_alienation",
-    label: "Freedom",
-    shortLabel: "Alienation",
-    description: "How strongly you protect authorship, liberation, and the refusal of false roles."
-  }
-];
+const DIMENSIONS: Record<Language, Omit<DimensionProfile, "score" | "percentage">[]> = {
+  en: [
+    {
+      id: "materialism",
+      label: "Material life",
+      shortLabel: "Conditions",
+      description: "How strongly you read ideas through labor, bodies, property, and lived conditions."
+    },
+    {
+      id: "dialectics",
+      label: "Contradiction",
+      shortLabel: "Change",
+      description: "How naturally you see tension, negation, and development inside events."
+    },
+    {
+      id: "individual_society",
+      label: "Self and society",
+      shortLabel: "Relation",
+      description: "How much you treat identity as something formed through shared life."
+    },
+    {
+      id: "authority_power",
+      label: "Power",
+      shortLabel: "Authority",
+      description: "How alert you are to institutions, command, discipline, and domination."
+    },
+    {
+      id: "ethics_action",
+      label: "Action",
+      shortLabel: "Practice",
+      description: "How much you turn belief into conduct, habit, responsibility, or strategy."
+    },
+    {
+      id: "freedom_alienation",
+      label: "Freedom",
+      shortLabel: "Alienation",
+      description: "How strongly you protect authorship, liberation, and the refusal of false roles."
+    }
+  ],
+  vi: [
+    {
+      id: "materialism",
+      label: "Đời sống vật chất",
+      shortLabel: "Điều kiện",
+      description: "Mức bạn đọc ý tưởng qua lao động, thân thể, sở hữu và điều kiện sống."
+    },
+    {
+      id: "dialectics",
+      label: "Mâu thuẫn",
+      shortLabel: "Thay đổi",
+      description: "Mức bạn tự nhiên nhìn thấy căng thẳng, phủ định và phát triển trong sự kiện."
+    },
+    {
+      id: "individual_society",
+      label: "Cá nhân và xã hội",
+      shortLabel: "Quan hệ",
+      description: "Mức bạn xem căn tính là điều được hình thành qua đời sống chung."
+    },
+    {
+      id: "authority_power",
+      label: "Quyền lực",
+      shortLabel: "Quyền uy",
+      description: "Mức bạn cảnh giác với thiết chế, mệnh lệnh, kỷ luật và thống trị."
+    },
+    {
+      id: "ethics_action",
+      label: "Hành động",
+      shortLabel: "Thực hành",
+      description: "Mức bạn biến niềm tin thành ứng xử, thói quen, trách nhiệm hoặc chiến lược."
+    },
+    {
+      id: "freedom_alienation",
+      label: "Tự do",
+      shortLabel: "Tha hóa",
+      description: "Mức bạn bảo vệ quyền tác giả đời mình, giải phóng và từ chối vai giả."
+    }
+  ]
+};
 
 const RADAR_CENTER = 160;
 const RADAR_RADIUS = 104;
+const RADAR_AXIS_COUNT = DIMENSIONS.en.length;
 
-function formatCreatedDate(createdAt?: string) {
-  if (!createdAt) return "New result";
+function formatCreatedDate(createdAt: string | undefined, language: Language) {
+  if (!createdAt) return language === "vi" ? "Kết quả mới" : "New result";
 
   const createdTime = new Date(createdAt).getTime();
-  if (Number.isNaN(createdTime)) return "New result";
+  if (Number.isNaN(createdTime)) return language === "vi" ? "Kết quả mới" : "New result";
 
-  return new Intl.DateTimeFormat("en", { day: "numeric", month: "short", year: "numeric" }).format(
+  return new Intl.DateTimeFormat(language === "vi" ? "vi-VN" : "en", { day: "numeric", month: "short", year: "numeric" }).format(
     new Date(createdTime)
   );
 }
@@ -83,11 +128,12 @@ function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-function buildDimensionProfiles(axisScores?: Partial<Record<AxisId, number>>): DimensionProfile[] {
-  const rawScores = DIMENSIONS.map((dimension) => Math.max(axisScores?.[dimension.id] ?? 0, 0));
+function buildDimensionProfiles(axisScores: Partial<Record<AxisId, number>> | undefined, language: Language): DimensionProfile[] {
+  const dimensionText = DIMENSIONS[language];
+  const rawScores = dimensionText.map((dimension) => Math.max(axisScores?.[dimension.id] ?? 0, 0));
   const maxScore = Math.max(...rawScores, 1);
 
-  return DIMENSIONS.map((dimension, index) => ({
+  return dimensionText.map((dimension, index) => ({
     ...dimension,
     score: axisScores?.[dimension.id] ?? 0,
     percentage: Math.round((rawScores[index] / maxScore) * 100)
@@ -95,7 +141,7 @@ function buildDimensionProfiles(axisScores?: Partial<Record<AxisId, number>>): D
 }
 
 function radarPoint(index: number, percentage: number, radius = RADAR_RADIUS) {
-  const angle = -Math.PI / 2 + (index * Math.PI * 2) / DIMENSIONS.length;
+  const angle = -Math.PI / 2 + (index * Math.PI * 2) / RADAR_AXIS_COUNT;
   const distance = radius * (percentage / 100);
 
   return {
@@ -114,9 +160,12 @@ function radarPolygon(percentages: number[], radius = RADAR_RADIUS) {
 }
 
 export function ResultClient({ sessionId }: { sessionId: string }) {
+  const { language } = useLanguage();
+  const copy = getAppCopy(language);
+  const philosopherById = getLocalizedPhilosopherById(language);
   const rootRef = useRef<HTMLElement>(null);
   const [result, setResult] = useState<StoredResult | null>(null);
-  const [status, setStatus] = useState("Opening the archive...");
+  const [status, setStatus] = useState<string>(copy.result.loading);
 
   useEffect(() => {
     let cancelled = false;
@@ -126,12 +175,12 @@ export function ResultClient({ sessionId }: { sessionId: string }) {
       if (local && !cancelled) {
         const parsed = JSON.parse(local) as StoredResult;
         setResult(parsed);
-        setStatus("Static commentary ready.");
+        setStatus(copy.result.ready);
       }
 
       const response = await fetch(`/api/results?id=${sessionId}`);
       if (!response.ok) {
-        if (!local) setStatus("This result could not be found. Retake the quiz to create a new session.");
+        if (!local) setStatus(copy.result.missing);
         return;
       }
 
@@ -139,17 +188,17 @@ export function ResultClient({ sessionId }: { sessionId: string }) {
       if (cancelled) return;
       setResult(stored);
       window.localStorage.setItem(`philosopher-result:${sessionId}`, JSON.stringify(stored));
-      setStatus("Static commentary ready.");
+      setStatus(copy.result.ready);
     }
 
     load().catch(() => {
-      if (!cancelled) setStatus("The archive could not load this result.");
+      if (!cancelled) setStatus(copy.result.loadError);
     });
 
     return () => {
       cancelled = true;
     };
-  }, [sessionId]);
+  }, [copy.result.loadError, copy.result.missing, copy.result.ready, sessionId]);
 
   useEffect(() => {
     if (!result || !rootRef.current || prefersReducedMotion()) return;
@@ -331,30 +380,33 @@ export function ResultClient({ sessionId }: { sessionId: string }) {
         <div className="result-scroll">
           <p>{status}</p>
           <Link className="primary-cta" href="/quiz">
-            Retake the test
+            {copy.result.retake}
           </Link>
         </div>
       </main>
     );
   }
 
-  const primary = PHILOSOPHER_BY_ID[result.topMatches[0].id];
+  const primary = philosopherById[result.topMatches[0].id];
   const secondary = result.topMatches.slice(1);
-  const createdDate = formatCreatedDate(result.createdAt);
-  const dimensions = buildDimensionProfiles(result.axisScores);
+  const createdDate = formatCreatedDate(result.createdAt, language);
+  const dimensions = buildDimensionProfiles(result.axisScores, language);
   const strongestDimensions = [...dimensions].sort((a, b) => b.percentage - a.percentage).slice(0, 2);
   const quietestDimensions = [...dimensions].sort((a, b) => a.percentage - b.percentage).slice(0, 2);
-  const commentary = getStaticCommentary(result);
+  const commentary = getStaticCommentary(result, language);
 
   return (
     <main ref={rootRef} className="result-page" style={{ "--philosopher-color": primary.color } as CSSProperties}>
       <nav className="result-nav" aria-label="Result navigation">
         <Link className="text-link result-return-link" href="/">
-          Return to landing
+          {copy.result.return}
         </Link>
-        <Link className="primary-cta result-retake-link" href="/quiz">
-          Retake the test
-        </Link>
+        <div className="result-nav-actions">
+          <Link className="primary-cta result-retake-link" href="/quiz">
+            {copy.result.retake}
+          </Link>
+          <LanguageToggle />
+        </div>
       </nav>
 
       <section className="result-hero">
@@ -371,17 +423,17 @@ export function ResultClient({ sessionId }: { sessionId: string }) {
           </div>
         </div>
         <div className="result-copy">
-          <p className="scribe-line">Your philosophical signature</p>
+          <p className="scribe-line">{copy.result.signature}</p>
           <h1>{primary.name}</h1>
           <p className="primary-label">{primary.shortLabel}</p>
           <p>{primary.description}</p>
-          <div className="result-meta-grid" aria-label="Result details">
+          <div className="result-meta-grid" aria-label={copy.result.detailsAria}>
             <div>
-              <span>Top cluster</span>
+              <span>{copy.result.topCluster}</span>
               <strong className="result-percentage">{result.topMatches[0].percentage}%</strong>
             </div>
             <div>
-              <span>Recorded</span>
+              <span>{copy.result.recorded}</span>
               <strong>{createdDate}</strong>
             </div>
           </div>
@@ -390,26 +442,23 @@ export function ResultClient({ sessionId }: { sessionId: string }) {
 
       <section className="dimension-section" aria-labelledby="dimension-title">
         <div className="section-kicker dimension-copy">
-          <span>Hidden axes</span>
-          <h2 id="dimension-title">Dimensions</h2>
-          <p>
-            Your radar compares the six philosophical pressures in the quiz. High points are your strongest habits;
-            lower points are quieter muscles that shape the edges of the match.
-          </p>
-          <div className="dimension-extremes" aria-label="Dimension strengths and weaknesses">
+          <span>{copy.result.hiddenAxes}</span>
+          <h2 id="dimension-title">{copy.result.dimensions}</h2>
+          <p>{copy.result.dimensionIntro}</p>
+          <div className="dimension-extremes" aria-label={copy.result.extremesAria}>
             <div>
-              <span>Strength</span>
+              <span>{copy.result.strength}</span>
               <strong>{strongestDimensions.map((dimension) => dimension.label).join(" / ")}</strong>
             </div>
             <div>
-              <span>Quieter edge</span>
+              <span>{copy.result.quietEdge}</span>
               <strong>{quietestDimensions.map((dimension) => dimension.label).join(" / ")}</strong>
             </div>
           </div>
         </div>
         <div className="dimension-radar-shell">
-          <RadarChart dimensions={dimensions} />
-          <div className="dimension-list" aria-label="Dimension percentages">
+          <RadarChart dimensions={dimensions} figureLabel={copy.result.radarFigure} imageLabel={copy.result.radarImage} />
+          <div className="dimension-list" aria-label={copy.result.dimensionPercentages}>
             {dimensions.map((dimension) => (
               <div
                 className="dimension-row"
@@ -429,16 +478,19 @@ export function ResultClient({ sessionId }: { sessionId: string }) {
 
       <section className="match-section">
         <div className="section-kicker match-heading">
-          <span>Constellation</span>
-          <h2>Nearby thinkers</h2>
+          <span>{copy.result.constellation}</span>
+          <h2>{copy.result.nearbyThinkers}</h2>
         </div>
         <div className="match-grid" aria-label="Secondary philosopher matches">
           {secondary.map((match) => {
-            const philosopher = PHILOSOPHER_BY_ID[match.id];
+            const philosopher = philosopherById[match.id];
             return (
               <article
                 className="match-card"
-                aria-label={`${philosopher.name} is a ${match.percentage}% nearby match`}
+                aria-label={formatTemplate(copy.result.nearbyMatch, {
+                  name: philosopher.name,
+                  percentage: match.percentage
+                })}
                 key={match.id}
                 style={{ "--match-color": philosopher.color } as CSSProperties}
               >
@@ -463,12 +515,12 @@ export function ResultClient({ sessionId }: { sessionId: string }) {
 
       <section className="quote-section">
         <div className="section-kicker">
-          <span>Reading room</span>
-          <h2>Quotes from your result constellation</h2>
+          <span>{copy.result.readingRoom}</span>
+          <h2>{copy.result.quotesTitle}</h2>
         </div>
         <div className="quote-stack">
           {result.topMatches.map((match) => {
-            const philosopher = PHILOSOPHER_BY_ID[match.id];
+            const philosopher = philosopherById[match.id];
             return (
               <blockquote key={match.id}>
                 <p>&ldquo;{philosopher.quote}&rdquo;</p>
@@ -483,18 +535,18 @@ export function ResultClient({ sessionId }: { sessionId: string }) {
 
       <section className="commentary-section">
         <div className="section-kicker commentary-heading">
-          <span>Interpretation</span>
-          <h2>Reflective commentary</h2>
+          <span>{copy.result.interpretation}</span>
+          <h2>{copy.result.commentary}</h2>
         </div>
         <div className="commentary-layout">
           <article className="commentary-scroll">
             <h3>{commentary.summary}</h3>
             <p>{commentary.beliefProfile}</p>
           </article>
-          <aside className="commentary-insight-panel" aria-label="Reflective commentary details">
-            <ListBlock title="Strengths" items={commentary.strengths} />
-            <ListBlock title="Blind spots" items={commentary.blindSpots} />
-            <ListBlock title="Read next" items={commentary.recommendedReadings} />
+          <aside className="commentary-insight-panel" aria-label={copy.result.commentaryDetails}>
+            <ListBlock title={copy.result.strengths} items={commentary.strengths} />
+            <ListBlock title={copy.result.blindSpots} items={commentary.blindSpots} />
+            <ListBlock title={copy.result.readNext} items={commentary.recommendedReadings} />
             <p className="disclaimer">{commentary.disclaimer}</p>
           </aside>
         </div>
@@ -503,7 +555,15 @@ export function ResultClient({ sessionId }: { sessionId: string }) {
   );
 }
 
-function RadarChart({ dimensions }: { dimensions: DimensionProfile[] }) {
+function RadarChart({
+  dimensions,
+  figureLabel,
+  imageLabel
+}: {
+  dimensions: DimensionProfile[];
+  figureLabel: string;
+  imageLabel: string;
+}) {
   const values = dimensions.map((dimension) => dimension.percentage);
   const axisPoints = dimensions.map((dimension, index) => ({
     dimension,
@@ -512,10 +572,10 @@ function RadarChart({ dimensions }: { dimensions: DimensionProfile[] }) {
   }));
 
   return (
-    <figure className="dimension-radar" aria-label="Radar chart of philosophical dimensions">
-      <svg viewBox="0 0 320 320" role="img" aria-label="Philosophical dimension radar">
+    <figure className="dimension-radar" aria-label={figureLabel}>
+      <svg viewBox="0 0 320 320" role="img" aria-label={imageLabel}>
         {[25, 50, 75, 100].map((level) => (
-          <polygon className="radar-grid" key={level} points={radarPolygon(Array(DIMENSIONS.length).fill(level))} />
+          <polygon className="radar-grid" key={level} points={radarPolygon(Array(dimensions.length).fill(level))} />
         ))}
         {axisPoints.map(({ dimension, outer }) => (
           <line className="radar-axis" key={dimension.id} x1={RADAR_CENTER} x2={outer.x} y1={RADAR_CENTER} y2={outer.y} />
