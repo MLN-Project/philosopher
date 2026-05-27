@@ -24,8 +24,8 @@ function getAssetNotes(language: Language) {
         copy: "Mỗi chân dung đều có đường dẫn đến trang tiểu sử nơi ảnh được nhúng, để người xem kiểm tra nguồn mà không mở trực tiếp tệp ảnh."
       },
       {
-        title: "Ảnh thay thế cục bộ",
-        copy: "Lenin và Engels đang dùng ảnh lưu trong thư mục public; các trang nguồn gốc vẫn được giữ trong sổ nguồn bên dưới."
+        title: "Tác nhân lập trình",
+        copy: "Codex được dùng như tác nhân lập trình để hỗ trợ viết mã, xử lý hình ảnh và sắp xếp nguồn cho trang."
       },
       {
         title: "Chất liệu tạo bằng AI",
@@ -54,8 +54,8 @@ function getAssetNotes(language: Language) {
       copy: "Wikimedia Commons source pages are linked where possible so each image can be traced back to its file record."
     },
     {
-      title: "Local replacements",
-      copy: "Lenin and Engels currently use local source images in the public folder, with their original source pages still listed below."
+      title: "Coding agent",
+      copy: "Codex was used as the coding agent for the site, helping with implementation, image handling, and source organization."
     },
     {
       title: "Generated materials",
