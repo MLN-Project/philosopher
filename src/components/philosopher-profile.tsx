@@ -48,17 +48,6 @@ export function PhilosopherProfile({ philosopherId }: PhilosopherProfileProps) {
         { autoAlpha: 1, y: 0, scale: 1, duration: 0.86, ease: "power3.out" }
       );
 
-      gsap.to(".profile-portrait-stage img", {
-        yPercent: -5,
-        ease: "none",
-        scrollTrigger: {
-          trigger: ".profile-hero",
-          start: "top top",
-          end: "bottom top",
-          scrub: true
-        }
-      });
-
       gsap.utils.toArray<HTMLElement>(".profile-reveal").forEach((section) => {
         gsap.fromTo(
           section,

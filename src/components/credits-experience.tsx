@@ -54,6 +54,16 @@ const assetNotes = [
     copy: "Generated visual work stays limited to atmosphere and interface texture: parchment, maps, scrolls, routes, and abstract UI elements."
   },
   {
+    title: "Video generation",
+    copy: "Google Flow was used for video generation in the atlas motion assets."
+  },
+  {
+    title: "Concept brainstorming",
+    copy: "The original atlas concept and quiz-question brainstorming are kept linked as a working source.",
+    href: "https://www.perplexity.ai/spaces/mln-aGASaXElTLOfyA_O6Ob02Q/27152611-b1f3-4b65-bd1c-d087890dacea",
+    linkLabel: "Open Perplexity source"
+  },
+  {
     title: "Research links",
     copy: "Each philosopher profile now lists the research and primary-text links used for the expanded history, quote labels, and timeline."
   }
@@ -102,7 +112,6 @@ export function CreditsExperience() {
           { autoAlpha: 0, y: 64, rotate: -3, scale: 0.92, duration: 0.86, stagger: 0.12 },
           "-=0.78"
         )
-        .from(".credits-source-ribbon span", { autoAlpha: 0, x: 22, duration: 0.42, stagger: 0.08 }, "-=0.4")
         .fromTo(
           ".credits-scroll-cue",
           { autoAlpha: 0, xPercent: -50, y: 18 },
@@ -121,16 +130,17 @@ export function CreditsExperience() {
         }
       });
 
-      gsap.to(".credits-hero-art", {
-        yPercent: -7,
-        ease: "none",
-        scrollTrigger: {
-          trigger: ".credits-hero",
-          start: "top top",
-          end: "bottom top",
-          scrub: 1
-        }
-      });
+      gsap
+        .timeline({
+          scrollTrigger: {
+            trigger: ".credits-hero",
+            start: "top top",
+            end: "bottom top",
+            scrub: 1
+          }
+        })
+        .to(".credits-hero-art", { yPercent: -7, ease: "none" }, 0)
+        .to(".credits-hero > .credits-scroll-cue", { y: 38, autoAlpha: 0, ease: "none" }, 0.1);
 
       gsap.from(".credits-fact", {
         autoAlpha: 0,
@@ -228,12 +238,6 @@ export function CreditsExperience() {
               />
             ))}
           </div>
-        <div className="credits-source-ribbon">
-          <span>Wikimedia Commons</span>
-          <span>Stanford Encyclopedia</span>
-          <span>Primary text links</span>
-          <span>Generated atlas textures</span>
-        </div>
         </div>
         <a className="credits-scroll-cue" href="#source-ledger" onClick={handleViewSourceClick}>
           <span>View the source</span>
@@ -263,6 +267,13 @@ export function CreditsExperience() {
               <div>
                 <h3>{note.title}</h3>
                 <p>{note.copy}</p>
+                {note.href ? (
+                  <a className="credits-note-link" href={note.href} rel="noreferrer" target="_blank">
+                    <FileText aria-hidden="true" />
+                    <span>{note.linkLabel}</span>
+                    <ExternalLink aria-hidden="true" />
+                  </a>
+                ) : null}
               </div>
             </article>
           ))}
@@ -305,7 +316,7 @@ export function CreditsExperience() {
                   <h3>{philosopher.name}</h3>
                   <p>{philosopher.era}</p>
                 </div>
-                <a className="credits-source-link" href={philosopher.sourceUrl} rel="noreferrer" target="_blank">
+                <a className="credits-source-link" href={philosopher.cutoutSourceUrl} rel="noreferrer" target="_blank">
                   <FileText aria-hidden="true" />
                   <span>Source page</span>
                   <ExternalLink aria-hidden="true" />
